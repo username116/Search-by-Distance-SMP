@@ -284,8 +284,8 @@ const bMismatchCRC = sbd.panelProperties.descriptorCRC[1] !== descriptorCRC;
 if (bMismatchCRC) {
 	if (sbd.panelProperties.descriptorCRC[1] !== -1) { // There may be multiple panels, don't nuke it on first init on a new panel
 		console.log('Search by Distance: CRC mismatch. Deleting old json cache.');
-		_deleteFile(folders.data + 'searchByDistance_cacheLink.json');
-		_deleteFile(folders.data + 'searchByDistance_cacheLinkSet.json');
+		_deleteFile(folders.data + 'searchByDistance_cacheLink_2.json');
+		_deleteFile(folders.data + 'searchByDistance_cacheLinkSet_2.json');
 	}
 	sbd.panelProperties.descriptorCRC[1] = descriptorCRC;
 	overwriteProperties(sbd.panelProperties); // Updates panel
@@ -293,12 +293,12 @@ if (bMismatchCRC) {
 if (sbd.panelProperties.bProfile[1]) { profiler.Print(); }
 // Start cache
 var cacheLinkSet; // NOSONAR [shared on files]
-if (_isFile(folders.data + 'searchByDistance_cacheLink.json')) {
-	const data = loadCache(folders.data + 'searchByDistance_cacheLink.json');
+if (_isFile(folders.data + 'searchByDistance_cacheLink_2.json')) {
+	const data = loadCache(folders.data + 'searchByDistance_cacheLink_2.json');
 	if (data.size) { cacheLink = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Used Cache - cacheLink from file.'); } } // NOSONAR [shared on files]
 }
-if (_isFile(folders.data + 'searchByDistance_cacheLinkSet.json')) {
-	const data = loadCache(folders.data + 'searchByDistance_cacheLinkSet.json');
+if (_isFile(folders.data + 'searchByDistance_cacheLinkSet_2.json')) {
+	const data = loadCache(folders.data + 'searchByDistance_cacheLinkSet_2.json');
 	if (data.size) { cacheLinkSet = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Used Cache - cacheLinkSet from file.'); } }
 }
 // Delays cache update after startup (must be called by the button file if it's not done here)
@@ -393,7 +393,7 @@ async function updateCache({ newCacheLink, newCacheLinkSet, bForce = false, prop
 		} else {
 			cacheLink = new Map();
 		}
-		saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink.json');
+		saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink_2.json');
 		if (sbd.panelProperties.bProfile[1]) { profiler.Print(); }
 		console.log('Search by Distance: New Cache - cacheLink');
 		window.NotifyOthers('Search by Distance: cacheLink map', cacheLink);
@@ -457,8 +457,8 @@ addEventListener('on_notify_data', (name, info) => {
 
 addEventListener('on_script_unload', () => {
 	if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Saving Cache.'); }
-	if (cacheLink) { saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink.json'); }
-	if (cacheLinkSet) { saveCache(cacheLinkSet, folders.data + 'searchByDistance_cacheLinkSet.json'); }
+	if (cacheLink) { saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink_2.json'); }
+	if (cacheLinkSet) { saveCache(cacheLinkSet, folders.data + 'searchByDistance_cacheLinkSet_2.json'); }
 	// SMP Bug: https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/205
 	/*
 	if (!sbd.panelProperties.firstPopup[1]) {

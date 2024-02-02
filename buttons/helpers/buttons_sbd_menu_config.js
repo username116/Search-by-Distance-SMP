@@ -1035,8 +1035,8 @@ function createConfigMenu(parent) {
 						fb.ShowPopupMessage('There is a calculation currently on process.\nTry again after it finishes. Check console (or animation).', 'Graph cache');
 						return;
 					}
-					_deleteFile(folders.data + 'searchByDistance_cacheLink.json');
-					_deleteFile(folders.data + 'searchByDistance_cacheLinkSet.json');
+					_deleteFile(folders.data + 'searchByDistance_cacheLink_2.json');
+					_deleteFile(folders.data + 'searchByDistance_cacheLinkSet_2.json');
 					cacheLink = void (0); // NOSONAR [global]
 					cacheLinkSet = void (0); // NOSONAR [global]
 					updateCache({ bForce: true, properties }); // Creates new one and also notifies other panels to discard their cache
