@@ -5,7 +5,7 @@
 const folders = {};
 folders.JsPackageDirs = (utils.GetPackageInfo(window.ScriptInfo.PackageId || -1) || {Directories: null}).Directories;
 if (folders.JsPackageDirs) {for (const key in folders.JsPackageDirs) {folders.JsPackageDirs[key] += '\\';}}
-folders.xxxName = 'scripts\\SMP\\xxx-scripts\\'; // Edit here to change install path (this is relative to the profile path)
+folders.xxxName = 'scripts\\SMP\\xxx-scripts_2\\'; // Edit here to change install path (this is relative to the profile path)
 folders.dataName = 'js_data_2\\';
 folders.xxx = folders.JsPackageDirs ? folders.JsPackageDirs.Root : fb.ProfilePath + folders.xxxName;
 folders.data = fb.ProfilePath + folders.dataName;
