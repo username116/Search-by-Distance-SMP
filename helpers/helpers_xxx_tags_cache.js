@@ -16,7 +16,7 @@ if (!isFoobarV2) { console.log('Tags Cache is being used on foobar2000 <2.0. Thi
 // Tag retrieval is too slow when retrieving tags on foobar2000 2.0+
 const tagsCache = {
 	files: {}, // one per tag
-	folder: fb.ProfilePath + 'js_data\\tagsCache\\',
+	folder: fb.ProfilePath + 'js_data_2\\tagsCache\\',
 	cache: new Map(), // [ID, [Value, ...], ...], where ID = handle.RawPath + handle.SubSong
 	filesCRC: {},
 	currCRC: {},

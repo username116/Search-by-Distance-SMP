@@ -490,7 +490,7 @@ function findStyleGenresMissingGraph({ genreStyleFilter = [], genreStyleTag = ['
 			'Graph descriptors:\n'
 			: '') +
 		'[scripts folder]\\main\\music_graph\\music_graph_descriptors_xxx.js\n' +
-		'[profile folder]\\js_data\\helpers\\music_graph_descriptors_xxx_user.js' + (userFileNotFound || userFileEmpty) + '\n\n' +
+		'[profile folder]\\js_data_2\\helpers\\music_graph_descriptors_xxx_user.js' + (userFileNotFound || userFileEmpty) + '\n\n' +
 		(missing.length > 5
 			? 'If you don\'t plan to retag your files or add substitutions and there are\n' +
 			'too many missing genre/styles, then it\'s recommended to use only\n' +
