@@ -416,44 +416,44 @@ async function updateCache({ newCacheLink, newCacheLinkSet, bForce = false, prop
 	}
 }
 
-addEventListener('on_notify_data', (name, info) => {
-	if (name === 'bio_imgChange' || name === 'biographyTags' || name === 'bio_chkTrackRev' || name === 'xxx-scripts: panel name reply') { return; }
-	if (!name.startsWith('Search by Distance')) { return; }
-	switch (name) {
-		case 'Search by Distance: requires cacheLink map': { // When asked to share cache, delay 1 sec. to allow script loading
-			if (typeof cacheLink !== 'undefined' && cacheLink.size) {
-				debounce(() => { if (typeof cacheLink !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLink map', cacheLink); } }, 1000)();
-				console.log('Search by Distance_2: Requested Cache - cacheLink.');
-			}
-			break;
-		}
-		case 'Search by Distance: requires cacheLinkSet map': { // When asked to share cache, delay 1 sec. to allow script loading
-			if (typeof cacheLinkSet !== 'undefined' && cacheLinkSet.size) {
-				debounce(() => { if (typeof cacheLinkSet !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLinkSet map', cacheLinkSet); } }, 1000)();
-				console.log('Search by Distance_2: Requested Cache - cacheLinkSet.');
-			}
-			break;
-		}
-		case 'Search by Distance: cacheLink map': {
-			if (info) {
-				console.log('Search by Distance_2: Used Cache - cacheLink from other panel.');
-				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
-				data.forEach((pair) => { if (pair[1].distance === null) { pair[1].distance = Infinity; } }); // stringify converts Infinity to null, this reverts the change
-				updateCache({ newCacheLink: new Map(data) });
-			}
-			break;
-		}
-		case 'Search by Distance: cacheLinkSet map': {
-			if (info) {
-				console.log('Search by Distance_2: Used Cache - cacheLinkSet from other panel.');
-				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
-				data.forEach((pair) => { if (pair[1] === null) { pair[1] = Infinity; } }); // stringify converts Infinity to null, this reverts the change
-				updateCache({ newCacheLinkSet: new Map(data) });
-			}
-			break;
-		}
-	}
-});
+// addEventListener('on_notify_data', (name, info) => {
+// 	if (name === 'bio_imgChange' || name === 'biographyTags' || name === 'bio_chkTrackRev' || name === 'xxx-scripts: panel name reply') { return; }
+// 	if (!name.startsWith('Search by Distance')) { return; }
+// 	switch (name) {
+// 		case 'Search by Distance: requires cacheLink map': { // When asked to share cache, delay 1 sec. to allow script loading
+// 			if (typeof cacheLink !== 'undefined' && cacheLink.size) {
+// 				debounce(() => { if (typeof cacheLink !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLink map', cacheLink); } }, 1000)();
+// 				console.log('Search by Distance_2: Requested Cache - cacheLink.');
+// 			}
+// 			break;
+// 		}
+// 		case 'Search by Distance: requires cacheLinkSet map': { // When asked to share cache, delay 1 sec. to allow script loading
+// 			if (typeof cacheLinkSet !== 'undefined' && cacheLinkSet.size) {
+// 				debounce(() => { if (typeof cacheLinkSet !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLinkSet map', cacheLinkSet); } }, 1000)();
+// 				console.log('Search by Distance_2: Requested Cache - cacheLinkSet.');
+// 			}
+// 			break;
+// 		}
+// 		case 'Search by Distance: cacheLink map': {
+// 			if (info) {
+// 				console.log('Search by Distance_2: Used Cache - cacheLink from other panel.');
+// 				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
+// 				data.forEach((pair) => { if (pair[1].distance === null) { pair[1].distance = Infinity; } }); // stringify converts Infinity to null, this reverts the change
+// 				updateCache({ newCacheLink: new Map(data) });
+// 			}
+// 			break;
+// 		}
+// 		case 'Search by Distance: cacheLinkSet map': {
+// 			if (info) {
+// 				console.log('Search by Distance_2: Used Cache - cacheLinkSet from other panel.');
+// 				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
+// 				data.forEach((pair) => { if (pair[1] === null) { pair[1] = Infinity; } }); // stringify converts Infinity to null, this reverts the change
+// 				updateCache({ newCacheLinkSet: new Map(data) });
+// 			}
+// 			break;
+// 		}
+// 	}
+// });
 
 addEventListener('on_script_unload', () => {
 	if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance_2: Saving Cache.'); }
