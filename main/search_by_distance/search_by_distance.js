@@ -283,7 +283,7 @@ const descriptorCRC = crc32(JSON.stringify(music_graph_descriptors) + musicGraph
 const bMismatchCRC = sbd.panelProperties.descriptorCRC[1] !== descriptorCRC;
 if (bMismatchCRC) {
 	if (sbd.panelProperties.descriptorCRC[1] !== -1) { // There may be multiple panels, don't nuke it on first init on a new panel
-		console.log('Search by Distance: CRC mismatch. Deleting old json cache.');
+		console.log('Search by Distance_2: CRC mismatch. Deleting old json cache.');
 		_deleteFile(folders.data + 'searchByDistance_cacheLink_2.json');
 		_deleteFile(folders.data + 'searchByDistance_cacheLinkSet_2.json');
 	}
@@ -295,11 +295,11 @@ if (sbd.panelProperties.bProfile[1]) { profiler.Print(); }
 var cacheLinkSet; // NOSONAR [shared on files]
 if (_isFile(folders.data + 'searchByDistance_cacheLink_2.json')) {
 	const data = loadCache(folders.data + 'searchByDistance_cacheLink_2.json');
-	if (data.size) { cacheLink = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Used Cache - cacheLink from file.'); } } // NOSONAR [shared on files]
+	if (data.size) { cacheLink = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance_2: Used Cache - cacheLink from file.'); } } // NOSONAR [shared on files]
 }
 if (_isFile(folders.data + 'searchByDistance_cacheLinkSet_2.json')) {
 	const data = loadCache(folders.data + 'searchByDistance_cacheLinkSet_2.json');
-	if (data.size) { cacheLinkSet = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Used Cache - cacheLinkSet from file.'); } }
+	if (data.size) { cacheLinkSet = data; if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance_2: Used Cache - cacheLinkSet from file.'); } }
 }
 // Delays cache update after startup (must be called by the button file if it's not done here)
 if (typeof buttonsBar === 'undefined' && typeof bNotProperties === 'undefined') { debounce(updateCache, 3000)({ properties: sbd.panelProperties }); }
@@ -330,7 +330,7 @@ async function updateCache({ newCacheLink, newCacheLinkSet, bForce = false, prop
 				? Object.values(tags).filter((t) => t.type.includes('graph') && !t.type.includes('virtual')).map((t) => t.tf).flat(Infinity)
 					.map((tag) => { return tag.indexOf('$') === -1 ? _t(tag) : tag; }).join('|')
 				: _t(globTags.genre) + '|' + _t(globTags.style);
-			console.log('Search by Distance: tags used for cache - ' + genreStyleTags);
+			console.log('Search by Distance_2: tags used for cache - ' + genreStyleTags);
 			const tfo = fb.TitleFormat(genreStyleTags);
 			const styleGenres = await new Promise((resolve) => {
 				const libItems = fb.GetLibraryItems().Convert();
@@ -395,14 +395,14 @@ async function updateCache({ newCacheLink, newCacheLinkSet, bForce = false, prop
 		}
 		saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink_2.json');
 		if (sbd.panelProperties.bProfile[1]) { profiler.Print(); }
-		console.log('Search by Distance: New Cache - cacheLink');
+		console.log('Search by Distance_2: New Cache - cacheLink');
 		window.NotifyOthers('Search by Distance: cacheLink map', cacheLink);
 	} else if (newCacheLink) {
 		cacheLink = newCacheLink;
 	}
 	if (typeof cacheLinkSet === 'undefined' && !newCacheLinkSet) { // only required if on_notify_data did not fire before
 		cacheLinkSet = new Map();
-		console.log('Search by Distance: New Cache - cacheLinkSet');
+		console.log('Search by Distance_2: New Cache - cacheLinkSet');
 		window.NotifyOthers('Search by Distance: cacheLinkSet map', cacheLinkSet);
 	} else if (newCacheLinkSet) {
 		cacheLinkSet = newCacheLinkSet;
@@ -423,20 +423,20 @@ addEventListener('on_notify_data', (name, info) => {
 		case 'Search by Distance: requires cacheLink map': { // When asked to share cache, delay 1 sec. to allow script loading
 			if (typeof cacheLink !== 'undefined' && cacheLink.size) {
 				debounce(() => { if (typeof cacheLink !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLink map', cacheLink); } }, 1000)();
-				console.log('Search by Distance: Requested Cache - cacheLink.');
+				console.log('Search by Distance_2: Requested Cache - cacheLink.');
 			}
 			break;
 		}
 		case 'Search by Distance: requires cacheLinkSet map': { // When asked to share cache, delay 1 sec. to allow script loading
 			if (typeof cacheLinkSet !== 'undefined' && cacheLinkSet.size) {
 				debounce(() => { if (typeof cacheLinkSet !== 'undefined') { window.NotifyOthers('Search by Distance: cacheLinkSet map', cacheLinkSet); } }, 1000)();
-				console.log('Search by Distance: Requested Cache - cacheLinkSet.');
+				console.log('Search by Distance_2: Requested Cache - cacheLinkSet.');
 			}
 			break;
 		}
 		case 'Search by Distance: cacheLink map': {
 			if (info) {
-				console.log('Search by Distance: Used Cache - cacheLink from other panel.');
+				console.log('Search by Distance_2: Used Cache - cacheLink from other panel.');
 				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
 				data.forEach((pair) => { if (pair[1].distance === null) { pair[1].distance = Infinity; } }); // stringify converts Infinity to null, this reverts the change
 				updateCache({ newCacheLink: new Map(data) });
@@ -445,7 +445,7 @@ addEventListener('on_notify_data', (name, info) => {
 		}
 		case 'Search by Distance: cacheLinkSet map': {
 			if (info) {
-				console.log('Search by Distance: Used Cache - cacheLinkSet from other panel.');
+				console.log('Search by Distance_2: Used Cache - cacheLinkSet from other panel.');
 				let data = JSON.parse(JSON.stringify([...info])); // Deep copy
 				data.forEach((pair) => { if (pair[1] === null) { pair[1] = Infinity; } }); // stringify converts Infinity to null, this reverts the change
 				updateCache({ newCacheLinkSet: new Map(data) });
@@ -456,7 +456,7 @@ addEventListener('on_notify_data', (name, info) => {
 });
 
 addEventListener('on_script_unload', () => {
-	if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance: Saving Cache.'); }
+	if (sbd.panelProperties.bStartLogging[1]) { console.log('Search by Distance_2: Saving Cache.'); }
 	if (cacheLink) { saveCache(cacheLink, folders.data + 'searchByDistance_cacheLink_2.json'); }
 	if (cacheLinkSet) { saveCache(cacheLinkSet, folders.data + 'searchByDistance_cacheLinkSet_2.json'); }
 	// SMP Bug: https://github.com/TheQwertiest/foo_spider_monkey_panel/issues/205
@@ -2392,7 +2392,7 @@ function saveCache(cacheMap, path) {
 function loadCache(path) {
 	let cacheMap;
 	if (_isFile(path)) {
-		if (utils.GetFileSize(path) > 400000000) { console.log('Search by Distance: cache link file size exceeds 40 Mb, file is probably corrupted (try resetting it): ' + path); }
+		if (utils.GetFileSize(path) > 400000000) { console.log('Search by Distance_2: cache link file size exceeds 40 Mb, file is probably corrupted (try resetting it): ' + path); }
 		let obj = _jsonParseFileCheck(path, 'Cache Link json', 'Search by Distance', utf8);
 		if (obj) {
 			obj = Object.entries(obj);
