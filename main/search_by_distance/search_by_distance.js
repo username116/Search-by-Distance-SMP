@@ -1,5 +1,5 @@
 ﻿'use strict';
-//04/02/24
+//13/02/24
 var version = '6.1.3'; // NOSONAR [shared on files]
 
 /* exported  searchByDistance, checkScoringDistribution */
@@ -78,8 +78,11 @@ include('..\\filter_and_query\\remove_duplicates.js');
 include('..\\sort\\scatter_by_tags.js');
 /* global shuffleByTags:readable */
 include('..\\..\\helpers\\callbacks_xxx.js');
+include('search_by_distance_genres.js');
+/* global findStyleGenresMissingGraph:readable */
+include('search_by_distance_culture.js');
+/* global getCountryISO:readable, getLocaleFromId:readable, getZoneArtistFilter:readable, getZoneGraphFilter:readable, music_graph_descriptors_countries:readable, music_graph_descriptors_culture:readable */
 include('search_by_distance_extra.js');
-/* global findStyleGenresMissingGraph:readable, getCountryISO:readable, getLocaleFromId:readable, getZoneArtistFilter:readable, getZoneGraphFilter:readable, music_graph_descriptors_countries:readable, music_graph_descriptors_culture:readable */
 
 checkCompatible('1.6.1', 'smp');
 
@@ -802,8 +805,10 @@ async function searchByDistance({
 	}
 	const bUseRecipeTags = !!(bUseRecipe && Object.hasOwn(recipeProperties, 'tags'));
 	// Parse args
-	graphDistance = parseGraphDistance(graphDistance, descr, bBasicLogging);
-	if (graphDistance === null) { return; }
+	if (method === 'GRAPH') {
+		graphDistance = parseGraphDistance(graphDistance, descr, bBasicLogging);
+		if (graphDistance === null) { return; }
+	}
 	// Theme check
 	const bUseTheme = !!(theme && (typeof recipe === 'string' && theme.length || Object.keys(theme).length));
 	if (bUseTheme) {
@@ -934,14 +939,11 @@ async function searchByDistance({
 		} else { method = 'WEIGHT'; } // For calcs they are the same!
 	} else { calcTags.dynGenre.weight = 0; }
 
-	const totalWeight = Object.keys(calcTags).reduce((total, key) => { return total + calcTags[key].weight; }, 0); //100%
-	const countWeights = Object.keys(calcTags).reduce((total, key) => { return (total + (calcTags[key].weight !== 0 ? 1 : 0)); }, 0);
-
 	if (!playlistLength) {
 		if (bBasicLogging) { console.log('Check \'Playlist Mix length\' value (' + playlistLength + '). Must be greater than zero.'); }
 		return;
 	}
-	if (!totalWeight && method === 'WEIGHT') {
+	if (method === 'WEIGHT' && Object.keys(calcTags).every((key) => calcTags[key].weight === 0)) {
 		if (bBasicLogging) {
 			if (calcTags.dynGenre.weight !== 0) { console.log('Check weight values, all are set to zero and \'dynGenre\' weight is not used for WEIGHT method.'); }
 			else { console.log('Check weight values, all are set to zero.'); }
@@ -1019,8 +1021,27 @@ async function searchByDistance({
 			calcTags.genreStyle.referenceSet = calcTags.genreStyle.referenceSet.intersection(descr.getNodeSet());
 		}
 		calcTags.genreStyle.referenceNumber = calcTags.genreStyle.referenceSet.size;
+		if (calcTags.genreStyle.referenceNumber === 0 && method === 'GRAPH') {
+			console.log('Warning: method was \'GRAPH\' but selected track had no genre tags. Changed to \'WEIGHT\'');
+		}
 	}
-
+	for (let key in calcTags) {
+		const tag = calcTags[key];
+		const type = tag.type;
+		if (tag.weight === 0) { continue; }
+		if (type.includes('virtual')) { continue; }
+		const bHasMultiple = type.includes('multiple') && tag.referenceNumber !== 0;
+		const bHasSingle = type.includes('single');
+		const bHasString = bHasSingle && type.includes('string') && tag.reference.length;
+		const bHasNumber = bHasSingle && type.includes('number') && tag.reference !== null;
+		if (!bHasMultiple && !bHasString && !bHasNumber) {
+			if (bBasicLogging) { console.log('Weight was not zero but selected track had no ' + key + ' tags for: ' + _b(tag.tf)); }
+			tag.weight = 0;
+		}
+	}
+	const totalWeight = Object.keys(calcTags).reduce((total, key) => { return total + calcTags[key].weight; }, 0); //100%
+	const countWeights = Object.keys(calcTags).reduce((total, key) => { return (total + (calcTags[key].weight !== 0 ? 1 : 0)); }, 0);
+	if (bSearchDebug) { console.log('Init Weights:', totalWeight, countWeights); }
 	let originalWeightValue = 0;
 	// Queries and ranges
 	const queryDebug = bSearchDebug ? [] : null;
@@ -1142,9 +1163,6 @@ async function searchByDistance({
 				}
 				if (bSearchDebug) { queryDebug[queryDebug.length - 1].query = query[preQueryLength]; }
 			}
-		} else if (tag.weight !== 0) {
-			if (bBasicLogging) { console.log('Weight was not zero but selected track had no ' + key + ' tags for: ' + _b(tag.tf)); }
-			tag.weight = 0;
 		}
 	}
 	// Dyngenre virtual tag is calculated with previous values
@@ -1184,7 +1202,9 @@ async function searchByDistance({
 		} else {
 			calcTags.artistRegion.reference = '';
 			if (calcTags.artistRegion.weight !== 0) {
-				if (bBasicLogging) { console.log('\'artistRegion\' weight was not zero but selected track had no locale tags'); }
+				if (bBasicLogging) {
+					console.log('Weight was not zero but selected track had no artist region tags for: ' + _b(calcTags.artistRegion.tf));
+				}
 				calcTags.artistRegion.weight = 0;
 			}
 		}
@@ -1197,7 +1217,9 @@ async function searchByDistance({
 			if (bSearchDebug) { console.log('genreStyleRegion: ' + originalWeightValue + ' + ' + calcTags.genreStyleRegion.weight); }
 			originalWeightValue += calcTags.genreStyleRegion.weight;
 		} else {
-			if (bBasicLogging) { console.log('\'genreStyleRegion\' weight was not zero but selected track had no genre/style tags'); }
+			if (bBasicLogging) {
+				console.log('Weight was not zero but selected track had no genre/style region tags for: ' + _b(calcTags.genreStyleRegion.tf));
+			}
 			calcTags.genreStyleRegion.weight = 0;
 		}
 	}
@@ -1205,7 +1227,9 @@ async function searchByDistance({
 	['related', 'unrelated'].forEach((key) => {
 		const tag = calcTags[key];
 		if (tag.referenceNumber === 0 && tag.weight !== 0) {
-			if (bBasicLogging) { console.log('\'' + key + '\' weight was not zero but selected track had no related/unrelated tags'); }
+			if (bBasicLogging) {
+				console.log('Weight was not zero but selected track had no ' + key + ' tags for: ' + _b(calcTags[key].tf));
+			}
 			tag.weight = 0;
 		}
 		if (key === 'related' && tag.weight !== 0) {
@@ -1326,7 +1350,7 @@ async function searchByDistance({
 		}
 	}
 	if (genreStyleRegionFilter !== -1) {
-		if (calcTags.genreStyle.referenceSet.size) {
+		if (calcTags.genreStyle.referenceNumber) {
 			const styleGenreRegion = getZoneGraphFilter([...calcTags.genreStyle.referenceSet], genreStyleRegionFilter).map((sg) => sanitizeQueryVal(sg));
 			if (styleGenreRegion.length) {
 				const match = genreStyleTagQuery.some((tag) => { return tag.indexOf('$') !== -1; }) ? 'HAS' : 'IS'; // Allow partial matches when using funcs
@@ -1508,6 +1532,7 @@ async function searchByDistance({
 		tagsArr.push(['MUSICBRAINZ_TRACKID']);
 	}
 	tagsArr = tagsArr.map((arr) => { return arr.map((tag) => { return (tag.indexOf('$') === -1 && tag !== 'skip' ? _t(tag) : tag); }).join(', '); });
+	if (bBasicLogging) { console.log(tagsArr); }
 	const tagsValByKey = [];
 	let tagsVal = [];
 	if (bTagsCache) {
@@ -1544,7 +1569,7 @@ async function searchByDistance({
 		weightValue = 0;
 		mapDistance = Infinity; // We consider points are not linked by default
 		// Get the tags according to weight and filter ''. Also create sets for comparison
-		const handleTag = { genreStyle: { set: new Set() } };
+		const handleTag = { genreStyle: { set: new Set(), number: 0 } };
 		for (let key in calcTags) {
 			const tag = calcTags[key];
 			if (tag.bVirtual && !['related', 'unrelated'].includes(key)) { continue; }
@@ -1586,6 +1611,7 @@ async function searchByDistance({
 				}
 			}
 		}
+		handleTag.genreStyle.number = handleTag.genreStyle.set.size;
 
 		// O(i*j*k) time
 		// i = # tracks retrieved by query, j & K = # number of style/genre tags
@@ -1690,7 +1716,7 @@ async function searchByDistance({
 
 		if (calcTags.dynGenre.weight !== 0 && calcTags.dynGenre.referenceNumber !== 0) {
 			handleTag.dynGenre = { val: [], number: 0 };
-			if (handleTag.genreStyle.set.size !== 0) {
+			if (handleTag.genreStyle.number !== 0) {
 				for (const genreStyle of handleTag.genreStyle.set) {
 					const dynGenre = sbd.genreStyleMap.get(genreStyle);
 					if (dynGenre) { handleTag.dynGenre.val.push(...dynGenre); }
@@ -1748,7 +1774,7 @@ async function searchByDistance({
 			const newTag = handleTag.artistRegion = { val: '' };
 			const localeTag = tag.handle ? _asciify(tag.handle[i].pop() || '') : '';
 			if (localeTag.length) { newTag.val = getCountryISO(localeTag) || ''; }
-			else { newTag.val = getLocaleFromId(artistHandle[i][0], worldMapData).iso; }
+			else if (artistHandle) { newTag.val = getLocaleFromId(artistHandle[i][0], worldMapData).iso; }
 			if (newTag.val.length) {
 				const weight = tag.weight;
 				const range = tag.range;
@@ -1768,11 +1794,11 @@ async function searchByDistance({
 			}
 		}
 
-		if (calcTags.genreStyleRegion.weight !== 0 && calcTags.genreStyleRegion.referenceNumber) {
+		if (calcTags.genreStyleRegion.weight !== 0 && calcTags.genreStyleRegion.referenceNumber !== 0) {
 			const tag = calcTags.genreStyleRegion;
 			const newTag = handleTag.genreStyleRegion = { val: [], number: 0 };
 			const weight = tag.weight;
-			if (handleTag.genreStyle.set.size !== 0) {
+			if (handleTag.genreStyle.number !== 0) {
 				newTag.val.push(...handleTag.genreStyle.set);
 			}
 			newTag.number = newTag.val.length;
@@ -1823,30 +1849,34 @@ async function searchByDistance({
 			if (!cacheLinkSet) { cacheLinkSet = new Map(); }
 			// Weight filtering excludes most of the tracks before other calcs -> Much Faster than later! (40k tracks can be reduced to just ~1k)
 			if (score >= minScoreFilter) {
-				// Get the minimum distance of the entire set of tags (track B, i) to every style of the original track (A, j):
-				// Worst case is O(i*j*k*lg(n)) time, greatly reduced by caching results (since tracks may be unique but not their tag values)
-				// where n = # nodes on map, i = # tracks retrieved by query, j & K = # number of style/genre tags
-				// Pre-filtering number of tracks is the best approach to reduce calc time (!)
-				// Distance cached at 2 points, for individual links (Rock -> Jazz) and entire sets ([Rock, Alt. Rock, Indie] -> [Jazz, Swing])
-				const fromDiff = calcTags.genreStyle.referenceSet.difference(handleTag.genreStyle.set);
-				const toDiff = handleTag.genreStyle.set.difference(calcTags.genreStyle.referenceSet);
-				const difference = fromDiff.size < toDiff.size ? fromDiff : toDiff;
-				if (difference.size) {
-					const toGenreStyle = fromDiff.size < toDiff.size ? handleTag.genreStyle.set : calcTags.genreStyle.referenceSet;
-					const mapKey = [
-						...[
-							[...difference].sort((a, b) => a.localeCompare(b)).join(','),
-							[...toGenreStyle].sort((a, b) => a.localeCompare(b)).join(','),
-						].sort((a, b) => a.localeCompare(b))
-					].join(' -> ');
-					const mapValue = cacheLinkSet.get(mapKey); // Mean distance from entire set (A,B,C) to (X,Y,Z)
-					if (typeof mapValue !== 'undefined') {
-						mapDistance = mapValue;
-					} else { // Calculate it if not found
-						mapDistance = calcMeanDistance(sbd.allMusicGraph, calcTags.genreStyle.referenceSet, handleTag.genreStyle.set, sbd.influenceMethod);
-						cacheLinkSet.set(mapKey, mapDistance); // Caches the mean distance from entire set (A,B,C) to (X,Y,Z)
+				if (calcTags.genreStyle.referenceNumber !== 0) {
+					if (handleTag.genreStyle.number !== 0) {
+						// Get the minimum distance of the entire set of tags (track B, i) to every style of the original track (A, j):
+						// Worst case is O(i*j*k*lg(n)) time, greatly reduced by caching results (since tracks may be unique but not their tag values)
+						// where n = # nodes on map, i = # tracks retrieved by query, j & K = # number of style/genre tags
+						// Pre-filtering number of tracks is the best approach to reduce calc time (!)
+						// Distance cached at 2 points, for individual links (Rock -> Jazz) and entire sets ([Rock, Alt. Rock, Indie] -> [Jazz, Swing])
+						const fromDiff = calcTags.genreStyle.referenceSet.difference(handleTag.genreStyle.set);
+						const toDiff = handleTag.genreStyle.set.difference(calcTags.genreStyle.referenceSet);
+						const difference = fromDiff.size < toDiff.size ? fromDiff : toDiff;
+						if (difference.size) {
+							const toGenreStyle = fromDiff.size < toDiff.size ? handleTag.genreStyle.set : calcTags.genreStyle.referenceSet;
+							const mapKey = [
+								...[
+									[...difference].sort((a, b) => a.localeCompare(b)).join(','),
+									[...toGenreStyle].sort((a, b) => a.localeCompare(b)).join(','),
+								].sort((a, b) => a.localeCompare(b))
+							].join(' -> ');
+							const mapValue = cacheLinkSet.get(mapKey); // Mean distance from entire set (A,B,C) to (X,Y,Z)
+							if (typeof mapValue !== 'undefined') {
+								mapDistance = mapValue;
+							} else { // Calculate it if not found
+								mapDistance = calcMeanDistance(sbd.allMusicGraph, calcTags.genreStyle.referenceSet, handleTag.genreStyle.set, sbd.influenceMethod);
+								cacheLinkSet.set(mapKey, mapDistance); // Caches the mean distance from entire set (A,B,C) to (X,Y,Z)
+							}
+						} else { mapDistance = 0; } // One is superset of the other
 					}
-				} else { mapDistance = 0; } // One is superset of the other
+				} else { mapDistance = 0; } // Behaves like weight method
 			}
 		} // Distance / style_genre_new_length < graphDistance / style_genre_length ?
 		if (method === 'GRAPH') {
@@ -1855,7 +1885,7 @@ async function searchByDistance({
 			}
 		}
 		if (method === 'WEIGHT') {
-			if (score > minScoreFilter) {
+			if (score >= minScoreFilter) {
 				scoreData.push({ index: i, name: titleHandle[i][0], score, bRelated, bUnrelated });
 			}
 		}

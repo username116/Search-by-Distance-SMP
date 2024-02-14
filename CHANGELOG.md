@@ -62,10 +62,14 @@
 - Toolbar: new settings for text scale (now independent of button and icon scale).
 - Toolbar: new settings for icon scale (now independent of button and text scale).
 ### Changed
+- Info: improved genre/style identification for substitutions and clusters.
 - Tags: improved queries created according to tags and weights when using 'Negative score for tags out of range'; as result processing time may be lower in some cases (if weight is not high enough to filter a track by such tag but negative cases would exclude it).
 - Cultural Regions: improvements to processing when using cultural filters in some cases.
 - Cache: changed cache structure to minimize file size (up to 50%) and loading time (up to 30%). Link cache will need to be rebuilt on update.
+- Configuration: changed the remove duplicates bias to prefer tracks with higher play-counts and positive feedback tag (love/hate).
 - Helpers: updated helpers.
+- Console: removed unnecessary logging in some cases.
+- Console: improved log file formatting on windows text editors which parse new lines only with CR+LF instead of LF.
 - Code cleanup.
 ### Removed
 ### Fixed
@@ -73,9 +77,12 @@
 - Readmes: minor fix to  'search_by_distance_info.txt' file.
 - Info: minor fixes to reports provided by 'search_by_distance_info' button.
 - Tags: incorrect handling of single-value tags in some cases. Issue #22.
+- Tags: incorrect handling of empty tags in some cases.
+- Tags: incorrect graph distance of genre/style tags if there were zero values. A reference with no genre/style tags should fallback to WEIGHT method and compared tracks should report infinite distance when missing the tags in GRAPH method. Issue #27.
 - Tags: incorrect scoring of genre/style tags when they were put on custom tags. Issue #25.
 - Tags: incorrect handling of genre/style tags not present on the graph for the reference track. Issue #26.
 - Toolbar: buttons' size not restored back to normal height after disabling 'Full size buttons' without reloading the panel.
+- Internal errors with set.add().
 - Crash when using a probability of picking lower than 100 in some cases.
 - Minor fixes.
 

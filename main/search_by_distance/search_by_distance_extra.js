@@ -1,18 +1,13 @@
 ﻿'use strict';
-//23/01/24
+//09/02/24
 
-/* exported calculateSimilarArtistsFromPls, writeSimilarArtistsTags, getArtistsSameZone, getZoneArtistFilter, getZoneGraphFilter, findStyleGenresMissingGraph , addTracksRelation */
+/* exported calculateSimilarArtistsFromPls, writeSimilarArtistsTags, addTracksRelation */
 
 include('search_by_distance.js');
-/* global sbd:readable, searchByDistance:readable, music_graph_descriptors_user:readable */
-/* global getHandleListTags:readable, getHandleListTagsV2:readable, globTags:readable, _p:readable, removeDuplicatesV2:readable, globQuery:readable, clone:readable, _q:readable, queryCombinations:readable, queryJoin:readable, round:readable, folders:readable, WshShell:readable, round:readable, round:readable, round:readable, popup:readable, _isFile:readable, _save:readable, _jsonParseFile:readable, utf8:readable, _deleteFile:readable, _b:readable, musicGraph:readable, calcMeanDistanceV2:readable, music_graph_descriptors:readable, secondsToTime:readable, _jsonParseFileCheck:readable, isArray:readable, secondsToTime:readable, _bt:readable, isString:readable, _asciify:readable, _qCond:readable, isInt:readable, getHandleTags:readable */
-include('..\\music_graph\\music_graph_descriptors_xxx_countries.js');
-/* global music_graph_descriptors_countries:readable */
-include('..\\music_graph\\music_graph_descriptors_xxx_culture.js');
-/* global music_graph_descriptors_culture:readable */
+/* global sbd:readable, searchByDistance:readable, getNearestGenreStyles:readable */
+/* global getHandleListTags:readable, getHandleListTagsV2:readable, globTags:readable, _p:readable, removeDuplicatesV2:readable, globQuery:readable, clone:readable, _q:readable, queryCombinations:readable, queryJoin:readable, round:readable, folders:readable, WshShell:readable, popup:readable, _isFile:readable, _save:readable, _jsonParseFile:readable, utf8:readable, _deleteFile:readable, _b:readable, secondsToTime:readable, getHandleTags:readable */
 include('..\\music_graph\\music_graph_descriptors_xxx_node.js');
-include('..\\world_map\\world_map_tables.js');
-/* global getCountryISO:readable, isoMapRev:readable , nameReplacersRev:readable */
+// music_graph_descriptors.nodeList
 
 // Similar artists
 async function calculateSimilarArtists({ selHandle = fb.GetFocusItem(), properties = null, theme = null, recipe = 'int_simil_artists_calc_graph.json', dateRange = 10, size = 50, method = 'weighted' } = {}) {
