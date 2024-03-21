@@ -2,6 +2,8 @@
 
 ## [Table of Contents]
 - [Unreleased](#unreleased)
+- [7.2.0](#720---2024-03-21)
+- [7.1.0](#710---2024-03-15)
 - [7.0.0](#700---2024-02-28)
 - [6.1.3](#613---2023-12-17)
 - [6.1.2](#612---2023-12-09)
@@ -54,6 +56,25 @@
 ### Changed
 ### Removed
 ### Fixed
+
+## [7.2.0] - 2024-03-21
+### Added
+- Descriptors: added Musical, Cabaret, Murga, Industrial Musical, Rock Musical, Music Hall, Revue, Vaudeville and Chèo styles.
+### Changed
+- Helpers: updated helpers.
+### Removed
+### Fixed
+
+## [7.1.0] - 2024-03-15
+### Added
+- Configuration: expanded user configurable file at '[FOOBAR PROFILE FOLDER]\js_data\presets\global\globSettings.json' with a new setting for panel repaint debugging purpose. Disabled by default.
+- Configuration: expanded user configurable file at '[FOOBAR PROFILE FOLDER]\js_data\presets\global\globSettings.json' with a new setting to check OS features on every panel startup. Enabled by default. This has been the default behavior since OS' features check was implemented, but it can now be disabled to improve init performance a bit, specially at foobar2000 startup (since it seems to hang in some cases when running it on slow HDDs or systems).
+### Changed
+- UI: Improved panel repaint routines to minimize resources usage.
+- Helpers: updated helpers.
+### Removed
+### Fixed
+- Presets: fixed LUFS TitleFormat CUI preset.
 
 ## [7.0.0] - 2024-02-28
 ### Added
@@ -813,7 +834,9 @@
 ### Removed
 ### Fixed
 
-[Unreleased]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.0.0...HEAD
+[Unreleased]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.2.0...HEAD
+[7.2.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.1.0...v7.2.0
+[7.1.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v6.1.3...v7.0.0
 [6.1.3]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v6.1.2...v6.1.3
 [6.1.2]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v6.1.1...v6.1.2
