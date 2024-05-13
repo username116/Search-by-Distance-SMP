@@ -1,5 +1,5 @@
 ﻿'use strict';
-//04/04/24
+//09/05/24
 var version = '7.2.0'; // NOSONAR [shared on files]
 
 /* exported  searchByDistance, checkScoringDistribution */
@@ -74,7 +74,7 @@ include('..\\music_graph\\music_graph_xxx.js');
 include('..\\music_graph\\music_graph_test_xxx.js');
 /* global testGraphNodes:readable, testGraphNodeSets:readable */
 include('..\\filter_and_query\\remove_duplicates.js');
-/* global removeDuplicatesV2:readable, removeDuplicatesV3:readable, removeDuplicates:readable, */
+/* global removeDuplicates:readable, removeDuplicatesAsync:readable, filterDuplicates:readable, */
 include('..\\sort\\scatter_by_tags.js');
 /* global shuffleByTags:readable */
 include('..\\..\\helpers\\callbacks_xxx.js');
@@ -137,6 +137,7 @@ const SearchByDistance_properties = {
 	checkDuplicatesByTag: ['Remove duplicates by', JSON.stringify(globTags.remDupl)],
 	sortBias: ['Duplicates track selection bias', globQuery.remDuplBias, { func: isStringWeak }, globQuery.remDuplBias],
 	bAdvTitle: ['Duplicates advanced RegExp title matching', true],
+	bMultiple: ['Partial Multi-value tag matching', true],
 	bSmartShuffle: ['Smart Shuffle by Artist', true],
 	smartShuffleTag: ['Smart Shuffle tag', JSON.stringify([globTags.artist])],
 	bSmartShuffleAdvc: ['Smart Shuffle extra conditions', true],
@@ -228,7 +229,7 @@ const sbd = {
 
 // Info Popup
 if (!sbd.panelProperties.firstPopup[1]) {
-	// sbd.panelProperties.firstPopup[1] = true; // Do it on script unloading the first time it successfully closed, so it can be reused somewhere if needed
+	// firstPopup is set true on script unloading the first time it successfully closed, so it can be reused somewhere if needed
 	overwriteProperties(sbd.panelProperties); // Updates panel
 	const readmeKeys = [{ name: 'search_by_distance', title: 'Search by Distance' }, { name: 'tags_structure', title: 'Tagging requisites' }]; // Must read files on first execution
 	readmeKeys.forEach((objRead) => {
@@ -484,7 +485,7 @@ if (sbd.panelProperties.bGraphDebug[1]) {
 /*
 	Variables allowed at recipe files and automatic documentation update
 */
-const recipeAllowedKeys = new Set(['name', 'properties', 'theme', 'recipe', 'tags', 'bNegativeWeighting', 'bFilterWithGraph', 'forcedQuery', 'bSameArtistFilter', 'bConditionAntiInfluences', 'bUseAntiInfluencesFilter', 'bUseInfluencesFilter', 'bSimilArtistsFilter', 'artistRegionFilter', 'genreStyleRegionFilter', 'method', 'scoreFilter', 'minScoreFilter', 'graphDistance', 'poolFilteringN', 'bPoolFiltering', 'bRandomPick', 'bInversePick', 'probPick', 'playlistLength', 'bSortRandom', 'bProgressiveListOrder', 'bInverseListOrder', 'bScatterInstrumentals', 'bSmartShuffle', 'bSmartShuffleAdvc', 'smartShuffleSortBias', 'bInKeyMixingPlaylist', 'bProgressiveListCreation', 'progressiveListCreationN', 'playlistName', 'bProfile', 'bShowQuery', 'bShowFinalSelection', 'bBasicLogging', 'bSearchDebug', 'bCreatePlaylist', 'bAscii', 'sortBias', 'bAdvTitle']);
+const recipeAllowedKeys = new Set(['name', 'properties', 'theme', 'recipe', 'tags', 'bNegativeWeighting', 'bFilterWithGraph', 'forcedQuery', 'bSameArtistFilter', 'bConditionAntiInfluences', 'bUseAntiInfluencesFilter', 'bUseInfluencesFilter', 'bSimilArtistsFilter', 'artistRegionFilter', 'genreStyleRegionFilter', 'method', 'scoreFilter', 'minScoreFilter', 'graphDistance', 'poolFilteringN', 'bPoolFiltering', 'bRandomPick', 'bInversePick', 'probPick', 'playlistLength', 'bSortRandom', 'bProgressiveListOrder', 'bInverseListOrder', 'bScatterInstrumentals', 'bSmartShuffle', 'bSmartShuffleAdvc', 'smartShuffleSortBias', 'bInKeyMixingPlaylist', 'bProgressiveListCreation', 'progressiveListCreationN', 'playlistName', 'bProfile', 'bShowQuery', 'bShowFinalSelection', 'bBasicLogging', 'bSearchDebug', 'bCreatePlaylist', 'bAscii', 'sortBias', 'bAdvTitle','bMultiple']);
 const recipePropertiesAllowedKeys = new Set(['smartShuffleTag', 'poolFilteringTag']);
 const themePath = folders.xxx + 'presets\\Search by\\themes\\';
 const recipePath = folders.xxx + 'presets\\Search by\\recipes\\';
@@ -638,6 +639,7 @@ async function searchByDistance({
 	bAscii = Object.hasOwn(properties, 'bAscii') ? properties.bAscii[1] : true, // Sanitize all tag values with ASCII equivalent chars
 	bTagsCache = Object.hasOwn(panelProperties, 'bTagsCache') ? panelProperties.bTagsCache[1] : false, // Read from cache
 	bAdvTitle = Object.hasOwn(properties, 'bAdvTitle') ? properties.bAdvTitle[1] : true, // RegExp duplicate matching,
+	bMultiple = Object.hasOwn(properties, 'bMultiple') ? properties.bMultiple[1] : true, // Single Multi-value tag matching,
 	checkDuplicatesByTag = Object.hasOwn(properties, 'checkDuplicatesByTag') ? JSON.parse(properties.checkDuplicatesByTag[1]) : globTags.remDupl,
 	sortBias = Object.hasOwn(properties, 'sortBias') ? properties.sortBias[1] : globQuery.remDuplBias, // Track selection bias,
 	// --->Weights
@@ -764,31 +766,28 @@ async function searchByDistance({
 					const newProperties = recipe[key];
 					if (newProperties) {
 						Object.keys(newProperties).forEach((rKey) => {
-							if (!Object.hasOwn(properties, rKey)) { console.log('Recipe has a property key not recognized: ' + rKey); return; }
-							recipeProperties[rKey] = newProperties[rKey];
+							if (!Object.hasOwn(properties, rKey)) { console.log('Recipe has a not recognized property key: ' + rKey); return; }
+							let newValue = newProperties[rKey] !== null ? newProperties[rKey] : Infinity;
+							recipeProperties[rKey] = newValue;
 							if (globalArgs.has(rKey)) {
-								// eval(key + ' = ' + value);
+								if (newValue !== Infinity) {
+									newValue = JSON.stringify(recipeProperties[rKey]);
+								}
+								eval(rKey + ' = ' + newValue);
 							}
 						});
 					}
 				} else if (key === 'tags') { // Overrule current ones (but don't touch original object!)
 					recipeProperties.tags = recipe.tags;
 				} else {
-					if (isStringWeak(value)) {
-						eval(key + ' = \'' + value + '\'');
-					} else if (isArrayStrings(value)) {
-						const newVal = '\'' + value.join('\',\'') + '\'';
-						eval(key + ' = [' + newVal + ']');
-					} else if (typeof value === 'object') {
-						const newVal = JSON.stringify(value);
-						eval(key + ' = ' + newVal);
-					} else {
-						eval(key + ' = ' + value);
-					}
+					const newValue = value !== Infinity
+						? JSON.stringify(value)
+						: value;
+					eval(key + ' = ' + newValue);
 					if (key === 'theme') { bOverwriteTheme = true; }
 					if (bSearchDebug) { console.log(key, value, eval(key)); }
 				}
-			} else { console.log('Recipe has a variable not recognized: ' + key); }
+			} else { console.log('Recipe has a not recognized variable: ' + key); }
 		});
 		// Process placeholders for tags
 		if (Object.hasOwn(recipe, 'tags') && Object.hasOwn(recipe.tags, '*')) {
@@ -825,10 +824,18 @@ async function searchByDistance({
 		// Array of objects
 		const tagsToCheck = Object.keys(tags).filter((k) => !tags[k].type.includes('virtual'));
 		// Theme tags must contain at least all the user tags
-		const tagCheck = Object.hasOwn(theme, 'tags') ? theme.tags.findIndex((tagArr) => { return !new Set(Object.keys(tagArr)).isSuperset(new Set(tagsToCheck)); }) : 0;
+		const tagCheck = Object.hasOwn(theme, 'tags')
+			? theme.tags.findIndex((tagArr) => { return !new Set(Object.keys(tagArr)).isSuperset(new Set(tagsToCheck)); })
+			: 0;
 		const bCheck = Object.hasOwn(theme, 'name') && tagCheck === -1;
 		if (!bCheck) {
-			console.log('Theme selected for mix is missing some keys: ' + (Object.hasOwn(theme, 'name') ? [...new Set(tagsToCheck).difference(new Set(Object.keys(theme.tags[tagCheck])))] : 'name'));
+			console.log('Using theme as reference: ' + theme.name + (path ? ' (' + path + ')' : '')); // NOSONAR [is always a string]
+			console.log(
+				'Theme is missing some keys: ' +
+				(Object.hasOwn(theme, 'tags') && tagCheck !== -1
+					? [...new Set(tagsToCheck).difference(new Set(Object.keys(theme.tags[tagCheck])))]
+					: 'name')
+			);
 			return;
 		}
 		if (bBasicLogging) {
@@ -1125,7 +1132,7 @@ async function searchByDistance({
 					}
 					query[preQueryLength] = queryJoin(groups, 'OR');
 				} else {
-					if (Array.isArray(tagNameTF)) {
+					if (Array.isArray(tagNameTF)) { // NOSONAR
 						const match = tagNameTF.some((tag) => { return tag.indexOf('$') !== -1; }) ? 'HAS' : 'IS'; // Allow partial matches when using funcs
 						query[preQueryLength] = queryJoin(queryCombinations(tag.reference, tagNameTF, 'OR', void (0), match), 'OR');
 					} else {
@@ -1295,10 +1302,8 @@ async function searchByDistance({
 		}
 		if (influencesQuery.length) {
 			query[queryLength] = queryJoin(influencesQuery, 'AND');
-		} else {
-			if (queryLength === 1 && !query[0].length) { query[queryLength] = ''; }
-			else { query[queryLength] = queryJoin(query, 'OR'); } //join previous query's
-		}
+		} else if (queryLength === 1 && !query[0].length) { query[queryLength] = ''; }
+		else { query[queryLength] = queryJoin(query, 'OR'); } //join previous query's
 	}
 	const queryStages = []; // Currently unused
 	if (bSameArtistFilter && !bUseTheme) {
@@ -1344,10 +1349,9 @@ async function searchByDistance({
 			if (len) {
 				if (len > 50000) { // Minor optimization for huge queries
 					queryStages.push(queryRegion);
-				} else {
-					if (query[queryLength].length) { query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(queryRegion); }
-					else { query[queryLength] += queryRegion; }
-				}
+				} else if (query[queryLength].length) {
+					query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(queryRegion);
+				} else { query[queryLength] += queryRegion; }
 			}
 		} else if (bBasicLogging) {
 			console.log('Artist cultural filter was used but selected track had no locale tags');
@@ -1364,10 +1368,9 @@ async function searchByDistance({
 				if (len) {
 					if (len > 50000) { // Minor optimization for huge queries
 						queryStages.push(queryRegion);
-					} else {
-						if (query[queryLength].length) { query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(queryRegion); }
-						else { query[queryLength] += queryRegion; }
-					}
+					} else if (query[queryLength].length) {
+						query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(queryRegion);
+					} else { query[queryLength] += queryRegion; }
 				}
 			}
 		}
@@ -1433,10 +1436,9 @@ async function searchByDistance({
 		if (len) {
 			if (len > 50000) { // Minor optimization for huge queries
 				queryStages.push(selQuery);
-			} else {
-				if (query[queryLength].length) { query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(selQuery); }
-				else { query[queryLength] += selQuery; }
-			}
+			} else if (query[queryLength].length) {
+				query[queryLength] = _p(query[queryLength]) + ' AND ' + _p(selQuery);
+			} else { query[queryLength] += selQuery; }
 		}
 	}
 	if (forcedQuery.length) { //Add user input query to the previous one
@@ -1496,9 +1498,9 @@ async function searchByDistance({
 			sortBias = sortBias.replace(globTags.genreStyle.map((t) => '%' + t + '%').join('\', \''), biasGenTags.join('\', \''));
 		}
 		if (bTagsCache) {
-			handleList = await removeDuplicatesV3({ handleList, sortOutput: '%TITLE% - ' + globTags.artist + ' - ' + globTags.date, bTagsCache, checkKeys: checkDuplicatesByTag, bAdvTitle });
+			handleList = await removeDuplicatesAsync({ handleList, sortOutput: '%TITLE% - ' + globTags.artist + ' - ' + globTags.date, bTagsCache, checkKeys: checkDuplicatesByTag, bAdvTitle, bMultiple });
 		} else {
-			handleList = removeDuplicatesV2({ handleList, sortBias, sortOutput: '%TITLE% - ' + globTags.artist + ' - ' + globTags.date, checkKeys: checkDuplicatesByTag, bAdvTitle });
+			handleList = removeDuplicates({ handleList, sortBias, sortOutput: '%TITLE% - ' + globTags.artist + ' - ' + globTags.date, checkKeys: checkDuplicatesByTag, bAdvTitle, bMultiple });
 		}
 	}
 	const trackTotal = handleList.Count;
@@ -1953,7 +1955,8 @@ async function searchByDistance({
 		let i = poolLength;
 		while (i--) { handlePoolArray.push(handleList[scoreData[i].index]); }
 		let handlePool = new FbMetadbHandleList(handlePoolArray);
-		handlePool = removeDuplicates({ handleList: handlePool, checkKeys: poolFilteringTag, nAllowed: poolFilteringN }); // n + 1
+		handlePool = filterDuplicates({ handleList: handlePool, checkKeys: poolFilteringTag, nAllowed: poolFilteringN }); // n + 1
+		/** * @type {[string[][]]} */
 		const [titleHandlePool] = getHandleListTagsV2(handlePool, ['TITLE'], { splitBy: null });
 		let filteredScoreData = [];
 		i = 0;
@@ -2201,6 +2204,7 @@ async function searchByDistance({
 		if (bScatterInstrumentals) { // Could reuse scatterByTags but since we already have the tags... done here
 			if (finalPlaylistLength > 2) { // Otherwise don't spend time with this...
 				let newOrder = [];
+				/** * @type {[string[][], string[][]]} */
 				const [language, speechness] = getHandleListTagsV2(new FbMetadbHandleList(selectedHandlesArray), ['LANGUAGE', 'SPEECHNESS']);
 				for (let i = 0; i < finalPlaylistLength; i++) {
 					const index = selectedHandlesData[i].index;
@@ -2208,7 +2212,7 @@ async function searchByDistance({
 						.filter((t) => t.bGraph && !t.bVirtual && (t.weight !== 0 || calcTags.dynGenre.weight !== 0))
 						.map((t) => t.handle[index].filter(Boolean)).flat(Infinity);
 					const tagSet_i = new Set(genreStyleTag.map((item) => { return item.toLowerCase(); }));
-					if (tagSet_i.has('instrumental') || language[i][0] === 'zxx' || speechness[i][0] === 0) { // Any match, then add to reorder list
+					if (tagSet_i.has('instrumental') || language[i][0] === 'zxx' || Number(speechness[i][0]) === 0) { // Any match, then add to reorder list
 						newOrder.push(i);
 					}
 				}
@@ -2275,10 +2279,11 @@ async function searchByDistance({
 							if (bSearchDebug) { console.log('selectedHandlesArray.length: ' + prevLength); }
 							[newSelectedHandlesArray, , , newArgs['sel']] = await searchByDistance(newArgs);
 							// Get all new tracks, remove duplicates after merging with previous tracks and only then cut to required length
-							selectedHandlesArray = removeDuplicatesV2({
+							selectedHandlesArray = removeDuplicates({
 								handleList: new FbMetadbHandleList(selectedHandlesArray.concat(newSelectedHandlesArray)),
 								checkKeys: checkDuplicatesByTag,
-								bAdvTitle
+								bAdvTitle,
+								bMultiple
 							}).Convert();
 							if (selectedHandlesArray.length > prevLength + newPlaylistLength) { selectedHandlesArray.length = prevLength + newPlaylistLength; }
 						}
@@ -2356,7 +2361,7 @@ async function searchByDistance({
 	// Store options
 	sbd.lastSearch.handle = sel;
 	sbd.lastSearch.options = {
-		theme, recipe, bAscii, bTagsCache, bAdvTitle, checkDuplicatesByTag, sortBias, tags, bNegativeWeighting, bFilterWithGraph, forcedQuery, dynQueries, bSameArtistFilter, bSimilArtistsFilter, bConditionAntiInfluences, bUseAntiInfluencesFilter, bUseInfluencesFilter, artistRegionFilter, genreStyleRegionFilter, method, scoreFilter, minScoreFilter, graphDistance, poolFilteringTag, poolFilteringN, bPoolFiltering, bRandomPick, bInversePick, probPick, playlistLength, bSortRandom, bProgressiveListOrder, bInverseListOrder, bScatterInstrumentals, bSmartShuffle, bSmartShuffleAdvc, smartShuffleSortBias, bInKeyMixingPlaylist, bHarmonicMixDoublePass, bProgressiveListCreation, progressiveListCreationN, bProfile, bShowQuery, bShowFinalSelection, bBasicLogging, bSearchDebug, playlistName, bCreatePlaylist
+		theme, recipe, bAscii, bTagsCache, bAdvTitle, bMultiple, checkDuplicatesByTag, sortBias, tags, bNegativeWeighting, bFilterWithGraph, forcedQuery, dynQueries, bSameArtistFilter, bSimilArtistsFilter, bConditionAntiInfluences, bUseAntiInfluencesFilter, bUseInfluencesFilter, artistRegionFilter, genreStyleRegionFilter, method, scoreFilter, minScoreFilter, graphDistance, poolFilteringTag, poolFilteringN, bPoolFiltering, bRandomPick, bInversePick, probPick, playlistLength, bSortRandom, bProgressiveListOrder, bInverseListOrder, bScatterInstrumentals, bSmartShuffle, bSmartShuffleAdvc, smartShuffleSortBias, bInKeyMixingPlaylist, bHarmonicMixDoublePass, bProgressiveListCreation, progressiveListCreationN, bProfile, bShowQuery, bShowFinalSelection, bBasicLogging, bSearchDebug, playlistName, bCreatePlaylist
 	};
 	// Share changes on cache (checks undefined to ensure no crash if it gets run on the first 3 seconds after loading a panel)
 	if (typeof cacheLink !== 'undefined' && oldCacheLinkSize !== cacheLink.size && method === 'GRAPH') { window.NotifyOthers('Search by Distance: cacheLink map', cacheLink); }
@@ -2453,8 +2458,12 @@ function loadCache(path) {
 function processRecipe(initialRecipe) {
 	let toAdd = {};
 	const processRecipeFile = (newRecipe) => {
-		const newPath = !_isFile(newRecipe) && _isFile(recipePath + newRecipe) ? recipePath + newRecipe : newRecipe;
-		const newRecipeObj = _jsonParseFileCheck(newPath, 'Recipe json', 'Search by Distance', utf8);
+		const newPath = _isFile(newRecipe)
+			? newRecipe
+			: _isFile(recipePath + newRecipe)
+				? recipePath + newRecipe
+				: null;
+		const newRecipeObj = newPath ? _jsonParseFileCheck(newPath, 'Recipe json', 'Search by Distance', utf8) : null;
 		if (!newRecipeObj) { console.log('Recipe not found: ' + newPath); }
 		else if (Object.hasOwn(newRecipeObj, 'tags') && Object.hasOwn(toAdd, 'tags')) {
 			const tags = deepMergeTags(newRecipeObj.tags, toAdd.tags);

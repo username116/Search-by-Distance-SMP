@@ -1,9 +1,9 @@
 ﻿'use strict';
-//04/04/24
+//09/05/24
 
 /* exported createConfigMenu */
 
-/* global processRecipe:readable, parseGraphDistance:readable, sbd:readable, testBaseTags:readable, SearchByDistance_properties:readable, music_graph_descriptors:readable, updateCache:readable, graphStatistics:readable, cacheLink:writable, cacheLinkSet:writable, tagsCache:readable, calculateSimilarArtistsFromPls:readable, writeSimilarArtistsTags:readable, getArtistsSameZone:readable, findStyleGenresMissingGraph:readable, graphDebug:readable, music_graph_descriptors_culture:readable, testGraphNodes:readable, testGraphNodeSets:readable, addTracksRelation:readable */ // eslint-disable-line no-unused-vars
+/* global processRecipePlaceholder:readable, parseGraphDistance:readable, sbd:readable, testBaseTags:readable, SearchByDistance_properties:readable, music_graph_descriptors:readable, updateCache:readable, graphStatistics:readable, cacheLink:writable, cacheLinkSet:writable, tagsCache:readable, calculateSimilarArtistsFromPls:readable, writeSimilarArtistsTags:readable, getArtistsSameZone:readable, findStyleGenresMissingGraph:readable, graphDebug:readable, music_graph_descriptors_culture:readable, testGraphNodes:readable, testGraphNodeSets:readable, addTracksRelation:readable */ // eslint-disable-line no-unused-vars
 include('..\\..\\helpers\\menu_xxx.js');
 /* global _menu:readable */
 include('..\\..\\helpers\\helpers_xxx.js');
@@ -25,7 +25,7 @@ function createConfigMenu(parent) {
 	const defTags = JSON.parse(properties.tags[3]);
 	// Process recipe
 	let recipe = {};
-	if (properties.recipe[1].length) { recipe = processRecipe(properties.recipe[1], tags); }
+	if (properties.recipe[1].length) { recipe = processRecipePlaceholder(properties.recipe[1], tags); }
 	// Update tooltip
 	parent.recipe = { recipe: properties.recipe[1].length ? recipe : null, name: properties.recipe[1] || '' };
 	// Recipe forced properties?
@@ -575,7 +575,7 @@ function createConfigMenu(parent) {
 			menu.newEntry({ menuName: subMenuName, entryText: 'sep', flags: MF_GRAYED });
 			menu.newEntry({
 				menuName: subMenuName, entryText: 'Edit entries...' + (bFile ? '' : '\t(new file)'), func: () => {
-					if (!bFile) { _save(file, JSON.stringify(options, null, '\t')); }
+					if (!bFile) { _save(file, JSON.stringify(options, null, '\t').replace(/\n/g,'\r\n')); }
 					_explorer(file);
 				}
 			});
@@ -592,7 +592,7 @@ function createConfigMenu(parent) {
 			if (bFile) {
 				options = _jsonParseFileCheck(file, 'Query filters json', 'Search by distance', utf8) || [];
 			} else {
-				options = [
+				options = [ // Use tag names which are then remapped to the user selected tag, i.e. GENRE to all genre tags
 					{ title: 'Same Artist', query: globTags.artist + ' IS #' + globTags.artistRaw + '#' },
 					{ title: 'sep' },
 					{ title: 'Different Genre', query: 'NOT GENRE IS #GENRE#' },
@@ -865,7 +865,7 @@ function createConfigMenu(parent) {
 		}
 	}
 	{	// Menu to configure other playlist attributes:
-		const menuName = menu.newMenu('Other playlist attributes');
+		const menuName = menu.newMenu('Other settings');
 		{
 			const options = ['playlistName'];
 			options.forEach((key) => {
@@ -900,12 +900,13 @@ function createConfigMenu(parent) {
 		}
 		menu.newEntry({ menuName, entryText: 'sep' });
 		{
+			const subMenuName = menu.newMenu('Duplicates', menuName);
 			{
-				createTagMenu(menuName, ['checkDuplicatesByTag']);
+				createTagMenu(subMenuName, ['checkDuplicatesByTag']);
 			}
 			{
 				menu.newEntry({
-					menuName, entryText: 'Duplicates selection bias...' + (Object.hasOwn(recipe, 'sortBias') ? '\t(forced by recipe)' : ''), func: () => {
+					menuName: subMenuName, entryText: 'Duplicates selection bias...' + (Object.hasOwn(recipe, 'sortBias') ? '\t(forced by recipe)' : ''), func: () => {
 						const input = Input.string('string', properties['sortBias'][1], 'Enter TF expression for track selection when finding duplicates:\n\nHigher valued tracks will be preferred.', 'Search by distance', globQuery.remDuplBias, void (0), false);
 						if (input === null) { return; }
 						properties['sortBias'][1] = input;
@@ -915,10 +916,13 @@ function createConfigMenu(parent) {
 			}
 			{
 				createBoolMenu(
-					menuName,
-					['bAdvTitle'],
+					subMenuName,
+					['bAdvTitle', 'bMultiple'],
 					void (0),
-					(key) => { if (key === 'bAdvTitle' && properties.bAdvTitle[1]) { fb.ShowPopupMessage(globRegExp.title.desc, 'Search by distance'); } }
+					(key) => {
+						if (key === 'bAdvTitle' && properties.bAdvTitle[1]) { fb.ShowPopupMessage(globRegExp.title.desc, 'Search by distance'); }
+						if (key === 'bMultiple' && properties.bMultiple[1]) { fb.ShowPopupMessage(globRegExp.singleTags.desc, 'Search by distance'); }
+					}
 				);
 			}
 		}
@@ -1052,7 +1056,7 @@ function createConfigMenu(parent) {
 					const profiler = sbd.panelProperties.bProfile[1] ? new FbProfiler('graphStatistics') : null;
 					parent.switchAnimation('Graph statistics', true);
 					graphStatistics({ properties, graph: sbd.allMusicGraph, influenceMethod: sbd.influenceMethod }).then((resolve) => {
-						_save(folders.temp + 'musicGraphStatistics.txt', resolve.text);
+						_save(folders.temp + 'musicGraphStatistics.txt', resolve.text.replace(/\n/g,'\r\n'));
 						console.log(resolve.text); // DEBUG
 						parent.switchAnimation('Graph statistics', false);
 						if (sbd.panelProperties.bProfile[1]) { profiler.Print(); }
