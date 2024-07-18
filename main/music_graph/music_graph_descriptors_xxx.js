@@ -1,5 +1,5 @@
 ﻿'use strict';
-//09/06/24
+//01/07/24
 
 /*
 	These are the variables of the music graph: nodes (styles and genres), links, link weighting (aka distance) and rendering settings.
@@ -109,21 +109,21 @@ const music_graph_descriptors = {
 		['Pop_supergenre'					,	['Electropop','Ambient Rock','Indie','Freak Folk','Hypersoul','Chillwave','Sophisti-Pop','Electroclash','Post-Britpop','Emo Pop','K-Pop','J-Pop','Kayokyoku','Britpop','Dance-Rock','Italo Disco','Dance Pop','Dream Pop','Shoegaze','Disco Pop','Eurodisco','Europop','Synth-Pop','80s Rock','Soft Rock','Power Pop','Chanson','Sunshine Pop','Psychedelic Pop','Pop Rock','Jazz-Pop','Baroque Pop','Songwriter','Country Pop','Brill Building Sound','Skiffle','Close Harmony']],
 		['Modern Folk_supergenre'			,	['Folk-Rock','Folk Pop','Folk Baroque','Folk Metal','Psychedelic Folk','Contemporary Folk','Folk-Jazz','Folktronica','Progressive Folk','Folk Punk','Hang Music','Ambient Folk']],
 		['European Pre-Modern Folk_supergenre',	['Medieval','Renaissance']],
-		['South American Folk_supergenre'	,	['Afro-Cuban','Son','Argentinian Folk','Venezuelan Folk','Batucada','Candombe','Cumbia','Chilean Folk','Colombian Folk','Cantautor','Forró','Jota','Mexican Folk','Peruvian Folk','Andean','Bolero','Mariachi','Ranchera','Tango','Samba','Nueva Gaita','Mambo','Afro-Latin Ritual-Tribal','Pre-Columbian Ritual-Tribal']],
+		['South American Folk_supergenre'	,	['Afro-Cuban','Son','Argentinian Folk','Venezuelan Folk','Rumba','Batucada','Candombe','Cumbia','Chilean Folk','Colombian Folk','Cantautor','Forró','Jota','Mexican Folk','Peruvian Folk','Andean','Bolero','Mariachi','Ranchera','Tango','Samba','Nueva Gaita','Mambo','Afro-Latin Ritual-Tribal','Pre-Columbian Ritual-Tribal']],
 		['North American Folk_supergenre'	,	['Folk-Rock','Freak Folk','Traditional Folk','Americana','American Primitive Guitar','Country Folk','Neo-Traditional Folk','Songwriter','Traditional American Folk','Old-Timey','Appalachian','Aboriginal Folk']],
 		['Nordic Folk_supergenre'			,	['Polka','Traditional European Folk','Pagan Folk','German Folk','Joik','Nordic Folk']],
 		['Celtic Folk_supergenre'			,	['Circle','Jig','Scottish','Celtic Folk','Traditional European Folk','Bal Folk','Irish','Scottish Folk','Celtic New Age']],
 		['African Folk_supergenre'			,	['Desert Blues','Malian Folk','Griot','Isicathamiya','Mauritanian Folk','Niger Folk','Nubian Folk','Sahrawi Folk','Tishoumaren','Gnawa','Classical Sufi','Semba','Kizomba','African Ritual-Tribal','Mbalax']],
 		['Asian Folk_supergenre'			,	['Tuvan','Hindustani','Israeli Folk','Afghan Folk','Gaana','Asian Ritual-Tribal']],
 		['European Folk_supergenre'			,	['British Folk-Rock','British Folk-Jazz','Folk Baroque','Andro','Bourree','Bresse','Chapelloise','Circle','Farelquesh','Gavotte','Hanterdro','Kost ar C\'hoad','Laridé','Mazurka','Jig','Plinn','Polka','Rond','Scottish','Tarantella','Tricot','Vals','Traditional European Folk','Bal Folk','German Folk','Irish','Scottish Folk','Romani','Georgian Folk','Branle']],
-		['South European Folk_supergenre'	,	['Cantautor','Rumba','Rumba Catalana','Rumba Fusión','Flamenco','Nuevo Flamenco','Fado','Jota','Spanish Folk','Traditional European Folk','Éntekhno','Sephardic','Branle']],
+		['South European Folk_supergenre'	,	['Cantautor','Rumba Flamenca','Rumba Catalana','Rumba Fusión','Flamenco','Nuevo Flamenco','Fado','Jota','Spanish Folk','Traditional European Folk','Éntekhno','Sephardic','Branle']],
 		['Country_supergenre'				,	['Country Rap','Alt. Country','Americana','Neo-Traditional Country','Contemporary Country','Outlaw Country','Country Pop','Country Rock','Nashville Sound','Bakersfield Sound','Progressive Bluegrass','Bluegrass','Honky Tonk','Old-Timey','Hillbilly','Country Boogie','Square Dance','Rodeo','Jug Band']],
 		['R&B_supergenre'					,	['Funktronica','Contemporary R&B','Ambient Funk','Urban Soul','Future Soul','Neo Soul','Electrofunk','Deep Funk','Disco','Soul Blues','Smooth Soul','Classic Funk','P-Funk','Funk Rock','Contemporary Funk','Psychedelic Funk','Psychedelic Soul','New Orleans R&B','Funk Blues','Deep Funk Revival','Philadelphia Soul','Motown Sound','Southern Soul','Doo Wop','R&B']],
 		['Blues_supergenre'					,	['Contemporary Blues','Desert Blues','Hill Country Blues','Soul Blues','Modern Electric Blues','Psychedelic Blues','Blues Rock','Funk Blues','British Blues','Zydeco','Chicago Blues','Detroit Blues','Memphis Blues','Jump Blues','Texas Blues','Piano Blues','Vaudeville Blues','Country Blues','Delta Blues']],
 		['Gospel_supergenre'				,	['Contemporary Christian Music','Christian Rock','Modern Gospel','Ragtime','Stride','Traditional Gospel','Spirituals','Worksongs']],
 		['Jazz_supergenre'					,	['Third Stream','Contemporary Jazz','Electro Swing','Nordic Jazz','Nu Jazz','Future Jazz','Acid Jazz','Smooth Jazz','Jazz-Rock','Fusion','Post-Bop','Free Jazz','Avant-Garde Jazz','Soul-Jazz','Jazz-Blues','Jazz-Funk','Hard-Bop','Cool Jazz','Bebop','New Orleans Jazz Revival','Dixieland Revival','Modal Jazz','Latin-Jazz','Fado','Bossa Nova','Swing','Mainstream Jazz','Gypsy-Jazz','Big Band','Chicago Jazz','New Orleans Jazz','Dixieland']],
 		['Jamaican_supergenre'				,	['Reggaeton','Ragga Hip-Hop','Ska Revival','Reggae Fusion','Ragga','Dancehall','Dembow','UK Reggae','Dub','Roots Reggae','Rocksteady','Ska','Calypso','Mento']],
-		['Rap_supergenre'					,	['Neoperreo','Symphonic Rap','Glitch Hop','Cloud Rap','Grime','Urban Breaks','Trap','Hip-Hop Soul','Pop Rap','Country Rap','Conscious','British Hip-Hop','South Coast','Midwest','East Coast','Gangsta','Horrorcore','Reggaeton','Progressive Rap','Ragga Hip-Hop','Jazz-Rap','West Coast','Miami Bass','Bounce','Boom Bap','Golden Age','Hardcore Rap','Melodic Hardcore','Electro','Old-School','Alt. Rap','Underground Rap','Psychedelic Rap']],
+		['Rap_supergenre'					,	['Neoperreo','Emo Rap','Symphonic Rap','Glitch Hop','Cloud Rap','Grime','Urban Breaks','Trap','Hip-Hop Soul','Pop Rap','Country Rap','Conscious','British Hip-Hop','South Coast','Midwest','East Coast','Gangsta','Horrorcore','Reggaeton','Progressive Rap','Ragga Hip-Hop','Jazz-Rap','West Coast','Miami Bass','Bounce','Boom Bap','Golden Age','Hardcore Rap','Melodic Hardcore','Electro','Old-School','Alt. Rap','Underground Rap','Psychedelic Rap']],
 		['Breakbeat_supergenre'				,	['EDM Trap','Future Bass','Bassline','Glitch Hop','Breakbeat Garage','Broken Beats','Nu Skool Breaks','UK Garage','Chemical Breaks','Big Beat','Trip Hop','Florida Breaks','Breakdance','Electro']],
 		['Drum & Bass_supergenre'			,	['Future Bass','Post-Dubstep','Dubstep','Bassline','Breakbeat Garage','Liquid Funk','Neuro Funk','Intelligent Drum & Bass','Ambient Drum & Bass','Jazzstep','Jump Up','Hardstep','Techstep','Darkcore','Darkstep','Old School Jungle']],
 		['Hardcore_supergenre'				,	['New Beat','Hardcore Techno','Hardcore Rave','Breakbeat Hardcore','Darkcore','Darkstep','Happy Hardcore','Bouncy Techno','Trancecore','Acidcore','Gabber','Speedcore','Frenchcore','Terrorcore','Nu Style Gabber','Mainstream Hardcore','Hardstyle']],
@@ -177,6 +177,7 @@ const music_graph_descriptors = {
 		['Urban Music & Rap XL'				,	['Trap','Reggaeton','Nuevo Flamenco','Neoperreo','Conscious','Grime']],
 		['Alt. Rap XL'						,	['British Hip-Hop','Progressive Rap','Jazz-Rap','Alt. Rap','Underground Rap','Psychedelic Rap','Symphonic Rap']],
 		['Downtempo Rap XL'					,	['Jazz-Rap','Trip Hop','Cloud Rap']],
+		['Sad Emo XL'						,	['Emo Rap','Emo Pop','Emo Rock','Sadcore']],
 		['Funk'								,	['Classic Funk','P-Funk','Deep Funk','Electrofunk','Funk Rock','Contemporary Funk','Funk Blues','Deep Funk Revival','Psychedelic Funk']],
 		['Soul'								,	['Philadelphia Soul','Motown Sound','Southern Soul','Psychedelic Soul']],
 		['Deep Soul XL'						,	['Smooth Soul','Soul Blues','Southern Soul']],
@@ -186,7 +187,7 @@ const music_graph_descriptors = {
 		['Traditional Blues XL'				,	['Vaudeville Blues','Country Blues','Delta Blues']],
 		['Traditional Country'				,	['Neo-Traditional Country','Nashville Sound','Bakersfield Sound','Bluegrass','Honky Tonk','Hillbilly','Country Boogie','Jug Band','Square Dance']],
 		['Post-Jazz'						,	['Electro Swing','Nordic Jazz','Nu Jazz','Future Jazz','Acid Jazz','Smooth Jazz','Jazz-Rock','Fusion']],
-		['Modern Jazz'						,	['Post-Bop','Free Jazz','Avant-Garde Jazz','Soul-Jazz','Jazz-Funk','Hard-Bop','Cool Jazz','Bebop']],
+		['Modern Jazz'						,	['Post-Bop','Free Jazz','Avant-Garde Jazz','Soul-Jazz','Jazz-Funk','Hard-Bop','Cool Jazz','Modal Jazz','Bebop']],
 		['Classic Jazz'						,	['Gypsy-Jazz','New Orleans Jazz','Dixieland','Chicago Jazz','Mainstream Jazz','Swing','Big Band','New Orleans Jazz Revival','Dixieland Revival']],
 		['Mainstream Jazz XL'				,	['Contemporary Jazz','Mainstream Jazz','Swing','Soul-Jazz','Jazz-Blues']],
 		['Reggae'							,	['Reggae Fusion','Ragga','UK Reggae','Dub','Roots Reggae','Rocksteady']],
@@ -198,13 +199,14 @@ const music_graph_descriptors = {
 		['Electro House XL'					,	['Fidget House','Electro House','Moombahton']],
 		['Hard Dance'						,	['Hardtrance','NRG','Hard NRG','Hard House','Hardtechno','Hardstyle']],
 		['Ambient Dance'					,	['Ambient House','Ambient Breaks','Illbient','Ambient Techno','IDM','Chill-Out Downtempo']],
-		['Progressive Electronic'			,	['Krautrock','New Age','Synth']],
+		['Early Progressive Electronic XL'	,	['Krautrock','New Age','Synth']],
+		['Progressive Electronic XL'		,	['Progressive House','Progressive Trance','Melodic Techno-House','Deep House']],
 		['Electronic Rap XL'				,	['Hip House','Ghettotech','Grime','EDM Trap','Trap','Electro','Glitch Hop']],
 		['New Age XL'						,	['Neo-Classical New Age','Healing Music','New Age','New Acoustic']],
 		['New Age Folk XL'					,	['Hang Music','Celtic New Age','New Acoustic']],
 		['Afro-Cuban XL'					,	['Son']],
 		['Latin Rock XL'					,	['Candombe Beat','Latin Rock','Chicano Rock']],
-		['Latin Folk XL'					,	['Afro-Cuban','Son','Argentinian Folk','Venezuelan Folk','Batucada','Candombe','Cumbia','Chilean Folk','Colombian Folk','Cantautor','Fado','Flamenco','Forró','Jota','Mexican Folk','Peruvian Folk','Spanish Folk','Traditional Folk','Rumba','Rumba Catalana','Rumba Fusión','Ranchera','Mariachi','Bolero','Samba','Nueva Gaita','Nuevo Flamenco']],
+		['Latin Folk XL'					,	['Afro-Cuban','Son','Argentinian Folk','Venezuelan Folk','Batucada','Candombe','Cumbia','Chilean Folk','Colombian Folk','Cantautor','Fado','Flamenco','Forró','Jota','Mexican Folk','Peruvian Folk','Spanish Folk','Traditional Folk','Rumba','Rumba Flamenca','Rumba Catalana','Rumba Fusión','Ranchera','Mariachi','Bolero','Samba','Nueva Gaita','Nuevo Flamenco']],
 		['Americana XL'						,	['Americana','American Primitive Guitar','Country Folk','Neo-Traditional Folk','Songwriter','Traditional American Folk']],
 		['Traditional American Folk XL'		,	['American Primitive Guitar','Neo-Traditional Folk','Traditional American Folk','Appalachian']],
 		['Asian Folk XL'					,	['Tuvan','Hindustani','Israeli Folk','Afghan Folk','Gaana']],
@@ -334,7 +336,7 @@ const music_graph_descriptors = {
 		['Neo Folk XL'						,	['Dark Ambient']],
 		['Cool Jazz'						,	['Bebop']],
 		['Hard-Bop'							,	['Bebop']],
-		['Nuevo Flamenco'					,	['Latin-Jazz','Soul-Jazz','Country Blues','Rumba']],
+		['Nuevo Flamenco'					,	['Latin-Jazz','Soul-Jazz','Country Blues','Rumba Flamenca']],
 		['Boom Bap'							,	['Golden Age','East Coast']],
 		['Chill Folk XL'					,	['New Acoustic']],
 		['Nu-Disco'							,	['Electro','Disco XL','Post-Disco XL']],
@@ -362,7 +364,8 @@ const music_graph_descriptors = {
 		['Cloud Rap'						,	['Trap','Chillwave']],
 		['Grime'							,	['UK Garage']],
 		['Eurodance'						,	['Hip House']],
-		['Ghettotech'						,	['Detroit Techno','Electro']]
+		['Ghettotech'						,	['Detroit Techno','Electro']],
+		['Emo Rap'							,	['Trap','Sadcore','Cloud Rap']]
 	],
 	// Secondary influence. For example one style being slightly influenced by another.
 	style_secondary_origin: [
@@ -399,13 +402,14 @@ const music_graph_descriptors = {
 		['Kayokyoku'						,	['Rock & Roll','Vocal Pop']],
 		['K-Pop'							,	['Europop']],
 		['Symphonic Rap'					,	['Underground Rap','Symphonic Rock']],
-		['Cloud Rap'						,	['Trip Hop']],
+		['Cloud Rap'						,	['Trip Hop','Jazz-Rap']],
 		['Grime'							,	['Dancehall']],
 		['Philadelphia Soul'				,	['Smooth Soul']],
 		['Neoperreo'						,	['Hip House']],
 		['Eurodance'						,	['Progressive House']],
 		['Acid House'						,	['Hip House','Trip Hop']],
-		['Ghettotech'						,	['Ghetto House','Hip House']]
+		['Ghettotech'						,	['Ghetto House','Hip House']],
+		['Emo Rap'							,	['Emo Pop','Nu Metal','Jazz-Rap','Horrorcore']]
 	],
 	// Anti-influences. Styles so different that are considered to be heavily distanced, even if the belong to the same genre parent.
 	// For ex. 'Americana' and 'British Folk-Rock' are both 'Folk' styles, but they are considered to be farther away than other 'Folk' styles.
@@ -444,7 +448,11 @@ const music_graph_descriptors = {
 		['Rap_supergenre'					,	['Traditional Country','Americana XL','Roots Rock']],
 		['Symphonic Rap'					,	['Hardcore Rap']],
 		['Opera'							,	['Contemporary Popular Choral XL']],
-		['Cloud Rap'						,	['Hardcore Rap','Gangsta','Horrorcore']]
+		['Cloud Rap'						,	['Hardcore Rap','Gangsta','Horrorcore']],
+		['Dream Pop'						,	['Emo Rap','Emo Pop','Emo Rock']],
+		['Emo Rap'							,	['Reggaeton','Nuevo Flamenco','Flamenco']],
+		['Swing'							,	['Bebop','Hard-Bop','Modal Jazz','Cool Jazz']],
+		['Dixieland'						,	['Bebop','Hard-Bop','Modal Jazz','Cool Jazz']]
 	],
 	// These are genre/styles which should always apply the 'Anti-influences' filter in a listening session (see customizable button).
 	// i.e. if  a 'Jazz' track is taken as reference, 'Jazz anti-influences' should always be filtered out, because they sound
@@ -457,6 +465,7 @@ const music_graph_descriptors = {
 		'Rap_supergenre',
 		'Progressive Rock XL',
 		'Sadcore',
+		'Emo Rap',
 		'Nature Music',
 		'Anatolian Rock',
 		'Desert Blues',
@@ -489,7 +498,7 @@ const music_graph_descriptors = {
 		['Underground Rap'					,	['Alt. Rap'							]],
 		['Melodic Hardcore'					,	['Hardcore Rap'						]],
 		['Psychedelic Funk'					,	['P-Funk'							]],
-		['Rumba'							,	['Rumba Catalana','Rumba Fusión'	]],
+		['Rumba Flamenca'					,	['Rumba Catalana','Rumba Fusión'	]],
 		['Ska Punk'							,	['Skacore'							]],
 		['Atmospheric Black Metal'			,	['Black Metal'						]],
 		['Glam Metal'						,	['Hair Metal'						]],
@@ -497,7 +506,8 @@ const music_graph_descriptors = {
 		['Hardtek'							,	['Freetekno'						]],
 		['Darksynth'						,	['Darkwave'							]],
 		['Deathcore'						,	['Metalcore'						]],
-		['Neoperreo'						,	['Reggaeton'						]]
+		['Neoperreo'						,	['Reggaeton'						]],
+		['Flamenco'							,	['Rumba Flamenca'					]]
 	],
 	// Some big groups or clusters are equal to genres or styles 'in the classic sense', so these are direct connections for them:
 	// ALWAYS PUT FIRST the genre at the graph, then -at the right- the one(s) expected to be found on tags.
@@ -578,33 +588,37 @@ const music_graph_descriptors = {
 		['J-Pop'							,	['Japanese Pop'						]],
 		['K-Pop'							,	['Korean Pop'						]],
 		['Musical'							,	['Industrial Musical','Rock Musical','Music Hall','Revue','Vaudeville','Chèo']],
-		['Trap'								,	['Latin Trap','Trap Latino'			]]
+		['Trap'								,	['Latin Trap','Trap Latino'			]],
+		['Kawaii Metal'						,	['Yurufuwa','Idol Metal','Cute Metal','Kawaiicore']],
+		['Trancecore'						,	['Electronicore','Synthcore'		]]
 	],
 	// Arbitrary classification of style clusters into folksonomy groups
 	style_cluster_groups: [
-		'Alt. Rock and Hardcore','Blues and Worksongs','Classic and Orchestral','Electronic and Synth','Folk and Folk-Rock','Hip-Hop and Reggae','Jazz and Lounge','Metal and Hard Rock','Pop and Rock','Soul and Funk','Other styles'
+		'Alt. Rock and Hardcore','Blues and Gospel','Classic and Orchestral','Electronic and Synth','Folk and Folk-Rock','Hip-Hop and Reggae','Jazz and Lounge','Metal and Hard Rock','Pop and Rock','Soul and Funk','Other styles'
 	],
 	getStyleGroup: (style_cluster) => {
 		if (/(-| |^)(metal|stoner|doom)(-| |$)/i.test(style_cluster)) {
 			return 'Metal and Hard Rock';
 		} else if (/(-| |^)(folk|folk-rock|americana|country|afro)(-| |$)/i.test(style_cluster)) {
 			return 'Folk and Folk-Rock';
-		} else if (/(-| |^)(urban|rap|reggae|loungetronica)(-| |$)/i.test(style_cluster)) {
+		} else if (/(-| |^)(urban|rap|reggae|loungetronica|jamaican)(-| |$)/i.test(style_cluster)) {
 			return 'Hip-Hop and Reggae';
-		} else if (/(-| |^)(electro|electronic|dance|house|rave|gabber|bass|wave)(-| |$)/i.test(style_cluster)) {
-			return 'Electronic and Synth';
-		} else if (/(-| |^)(gothic|progressive|punk|grunge|gaze)(-| |$)/i.test(style_cluster)) {
+		} else if (/(-| |^)(punk)(-| |$)/i.test(style_cluster)) {
 			return 'Alt. Rock and Hardcore';
-		} else if (/(-| |^)(pop|rock)(-| |$)/i.test(style_cluster)) {
-			return 'Pop and Rock';
-		} else if (/(-| |^)(soul|funk|disco)(-| |$)/i.test(style_cluster)) {
+		} else if (/(-| |^)(electro|electronic|dance|house|rave|gabber|bass|wave|techno|trance|breakbeat|downtempo|hardcore)(-| |$)/i.test(style_cluster)) {
+			return 'Electronic and Synth';
+		} else if (/(-| |^)(gothic|progressive|grunge|gaze|industrial|alternative|emo)(-| |$)/i.test(style_cluster)) {
+			return 'Alt. Rock and Hardcore';
+		} else if (/(-| |^)(soul|funk|disco|r&b)(-| |$)/i.test(style_cluster)) {
 			return 'Soul and Funk';
+		} else if (/(-| |^)(choral|ballroom|orchestral|Chamber|secular|spiritual|classical)(-| |$)/i.test(style_cluster)) {
+			return 'Classic and Orchestral';
+		} else if (/(-| |^)(pop|rock|contemporary)(-| |$)/i.test(style_cluster)) {
+			return 'Pop and Rock';
 		} else if (/(-| |^)(jazz|lounge|easy)(-| |$)/i.test(style_cluster)) {
 			return 'Jazz and Lounge';
-		} else if (/(-| |^)(blues)(-| |$)/i.test(style_cluster)) {
-			return 'Blues and Worksongs';
-		} else if (/(-| |^)(choral|ballroom|orchestral|Chamber|secular|spiritual)(-| |$)/i.test(style_cluster)) {
-			return 'Classic and Orchestral';
+		} else if (/(-| |^)(blues|gospel)(-| |$)/i.test(style_cluster)) {
+			return 'Blues and Gospel';
 		} else {
 			return 'Other styles';
 		}
@@ -700,7 +714,8 @@ const music_graph_descriptors = {
 	// Anything named '..._supergenre' will be added to the html color label legend automatically.
 	// If more than one '...Folk..._supergenre' or '...Classical..._supergenre' is found, then it will be skipped.
 	// i.e. It will list Folk and Classical only once, even if there are multiple (sub)SuperGenres.
-	map_colors: [	// Todo: use colorbrewer sequential palettes
+	// As alternative, colorbrewer sequential palettes could be used
+	map_colors: [
 		// Supergenres
 		['Industrial_supergenre'				,'#e04103'],
 		['Metal_supergenre'						,'#D88417'],
@@ -790,9 +805,15 @@ const music_graph_descriptors = {
 
 	// Other
 	bPreRender: true, // (false) Renders graph on the fly on browsers or (true) pre-rendering (it may take some time while loading entire graph)
-	renderMethod: 'realDistance'	// ('graph') Renders graph according to link centrality/gravity forces.
-									// ('graphWeighted') uses the link's weight values at top to render similar distances to real ones, but also using link forces.
-									// ('realDistance') uses the link's weight values at top to render real distances. Beware it will look really weird!
+
+	/**
+	'graph': Renders graph according to link centrality/gravity forces.
+	'graphWeighted': uses the link's weight values at top to render similar distances
+		to real ones, but also using link forces.
+	'realDistance': uses the link's weight values at top to render real distances.
+		Beware it will look really weird!
+	*/
+	renderMethod: 'realDistance'
 };
 
 (function () {	// Clean non ASCII values

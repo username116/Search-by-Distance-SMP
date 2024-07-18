@@ -1,5 +1,5 @@
 ﻿'use strict';
-//04/01/24
+//01/07/24
 
 /* exported testGraphNodes, testGraphNodeSets */
 
@@ -16,31 +16,38 @@ function testGraphNodes(mygraph) {
 	let influence = 0;
 	[ // here both keys...
 		{name: '<------------------- Arbitrary node distance tests ------------------->'},
-		{from: 'Baroque',		to: 'Modernist'},
-		{from: 'New Age',		to: 'Modernist'},
-		{from: 'Hard Rock',		to: 'Folk-Rock'},
-		{from: 'Jazz Vocal',	to: 'Heavy Metal'},
-		{from: 'Grunge',		to: 'House'},
-		{from: 'Electronic',	to: 'Alt. Rock'},
-		{from: 'Electronic',	to: 'Blues Rock'},
-		{from: 'Blues',			to: 'Hip-Hop'},
-		{from: 'Trance',		to: 'House'},
-		{from: 'Americana',		to: 'Folk-Rock'},
-		{from: 'Trip Hop',		to: 'Chill-Out Downtempo'},
-		{from: 'Shoegaze',		to: 'Indie'},
-		{from: 'Blues Rock',	to: 'Gangsta'},
-		{from: 'Blues Rock',	to: 'Hip-Hop'},
-		{from: 'Blues Rock',	to: 'Blues'},
-		{from: 'Blues',			to: 'Blues'},
-		{from: 'Blues',			to: 'Heavy Metal'},
-		{from: 'Blues',			to: 'Glam Metal'},
-		{from: 'Blues',			to: 'Pop Metal'},
-		{from: 'Blues Rock',	to: 'Pop Metal'},
-		{from: 'Tuvan',			to: 'Desert Blues'},
-		{from: 'Anatolian Rock',to: 'Desert Blues'},
-		{from: 'Pagan Folk',	to: 'Americana'},
-		{from: 'Pagan Folk',	to: 'Tulsa Sound'},
-		{from: 'P-Funk',		to: 'Psychedelic Rock'},
+		{from: 'Baroque',			to: 'Modernist'},
+		{from: 'New Age',			to: 'Modernist'},
+		{from: 'Hard Rock',			to: 'Folk-Rock'},
+		{from: 'Jazz Vocal',		to: 'Heavy Metal'},
+		{from: 'Grunge',			to: 'House'},
+		{from: 'Electronic',		to: 'Alt. Rock'},
+		{from: 'Electronic',		to: 'Blues Rock'},
+		{from: 'Blues',				to: 'Hip-Hop'},
+		{from: 'Trance',			to: 'House'},
+		{from: 'Americana',			to: 'Folk-Rock'},
+		{from: 'Trip Hop',			to: 'Chill-Out Downtempo'},
+		{from: 'Shoegaze',			to: 'Indie'},
+		{from: 'Blues Rock',		to: 'Gangsta'},
+		{from: 'Blues Rock',		to: 'Hip-Hop'},
+		{from: 'Blues Rock',		to: 'Blues'},
+		{from: 'Blues',				to: 'Blues'},
+		{from: 'Blues',				to: 'Heavy Metal'},
+		{from: 'Blues',				to: 'Glam Metal'},
+		{from: 'Blues',				to: 'Pop Metal'},
+		{from: 'Blues Rock',		to: 'Pop Metal'},
+		{from: 'Tuvan',				to: 'Desert Blues'},
+		{from: 'Anatolian Rock',	to: 'Desert Blues'},
+		{from: 'Pagan Folk',		to: 'Americana'},
+		{from: 'Pagan Folk',		to: 'Tulsa Sound'},
+		{from: 'P-Funk',			to: 'Psychedelic Rock'},
+		{from: 'Emo Rap',			to: 'Sadcore'},
+		{from: 'Emo Rap',			to: 'Emo Rock'},
+		{from: 'Sadcore',			to: 'Nu Metal'},
+		{from: 'Emo Rap',			to: 'Jazz-Rap'},
+		{from: 'Emo Rap',			to: 'Cloud Rap'},
+		{from: 'Progressive House',	to: 'Progressive Trance'},
+		{from: 'Dixieland',			to: 'Modal Jazz'},
 	].forEach((o) => {
 		if (Object.hasOwn(o, 'name')) {console.log(o.name);}
 		if (Object.hasOwn(o, 'from') && Object.hasOwn(o, 'to')) {
@@ -149,6 +156,10 @@ function testGraphNodeSets(mygraph) {
 		{
 			from:	[ 'Blues', 'Blues Rock', 'Modern Electric Blues', 'Electric Blues' ],
 			to:		[ 'Hard Rock', 'Heavy Metal', 'Glam Metal', 'Pop Metal' ]
+		},
+		{
+			from:	[ 'Jazz', 'Dixieland' ],
+			to:		[ 'Jazz', 'Modal Jazz' ]
 		},
 		// Exchanging one genre from the Reference with one from the Target outputs different distance
 		{	name: '<------------------- Exchange asymmetry ------------------->'},

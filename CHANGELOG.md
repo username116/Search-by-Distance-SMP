@@ -53,27 +53,37 @@
 
 ## [Unreleased][]
 ### Added
-- Descriptors: added Cloud Rap, Grime, Deathcore, Neoperreo and Dark Techno styles.
-- Descriptors: added Gothic XL style, Urban Rap XL, Urban R&B XL, Electronic Rap XL cluster.
+- Descriptors: added Cloud Rap, Grime, Deathcore, Neoperreo, Emo Rap, Rumba Flamenca and Dark Techno styles.
+- Descriptors: added Gothic XL style, Urban Rap XL, Urban R&B XL, Electronic Rap XL, Sad Emo XL, Progressive Electronic XL and Early Progressive Electronic XL cluster.
 - Remove duplicates: added multi-value parsing to duplicates removal. i.e. A track with multiple artists but same title can be considered a duplicated if at least one of those artists matches (instead of requiring all to match).  This setting can be switched at the 'Other settings...\Duplicates' submenu. See [this](https://github.com/regorxxx/Search-by-Distance-SMP/issues/31#issuecomment-2111061984) for more info.
+- Tags: to simplify the usage of 'RELATED' and 'UNRELATED' tags, new entries at the customizable button (see Other tools\Relate selected tracks...) have been added. They allow to add the 'ARTIST' values to 'RELATED' or 'UNRELATED' tags for the selected tracks (skipping the own artist of the track upon tagging).
 - Readmes: added readme for global settings found at 'foobar2000\js_data\presets\global' .json files.
 - Configuration: expanded user configurable file at '[FOOBAR PROFILE FOLDER]\js_data\presets\global\globSettings.json' with a new setting for console logging to file. Disabled by default. Now this is a change from the previous behavior, where console was always logged to 'console.log' file at the [FOOBAR PROFILE FOLDER]. It can now be switched, but since it's probably not useful for most users is disabled by default.
 ### Changed
 - GRAPH: better handling of substitutions, which are now parsed before calculating scores, in case they introduce duplicates (like 'Trap' and 'Latin Trap' both being replaced by 'Trap').
 - Descriptors: improved AllMusic support.
 - Descriptors: updated some primary and secondary influences.
+- Descriptors: updated some anti-influences (in particular for jazz styles).
 - Configuration: changed the remove duplicates bias to prefer lossless tracks with 16 bits per sample, 44.1 Khz sample rate and greater %DYNAMIC RANGE% values.
+- Tags: reworked similar artists, same artist and cultural filters to better handle tag values with commas.
+- Tags: relating/unrelating tracks by MBID or title now skips the own value of such tags before tagging. i.e. you can select multiple tracks with same title, and they will not add that title on theirselves but only different ones.
+- UI: tag values are now listed on the button tooltip of info button.
+- UI: info button tooltip behavior now follows the global setting for the toolbar.
 - UI: minor menu tweaks to better group and name some settings.
 - UI: minor menu tweaks to reports.
+- Presets: reworked changes introduced at [4.0.0](#400---2023-02-15) related to graph distance.
 - Presets: enhanced parsing of recipe's variables.
 - Presets: new recipes and query filter presets are now saved with Windows EOL for compatibility improvements with Windows text editors.
 - Remove duplicates: improved performance of duplicates removal in multiple places.
 - Helpers: json button files are now saved with Windows EOL for compatibility improvements with Windows text editors.
 - Helpers: updated helpers.
+- Performance improvement (approx. 15%) changing the 'RELATED'/'UNRELATED' tags logic usage implemented at [7.0.0](#700---2024-02-28). Note this change applies no matter the reference tracks has or not such tags, as long as they have a weight associated.
 ### Removed
 ### Fixed
+- Influences: in some cases (anti)influences weight was not considered properly to calculate the total graph distance between nodes which had multiple links.
 - Presets: recipe error on some cases for user-created recipes. May require to rebuild user created recipes (or remove any trace of "poolFilteringTag" from them using a text editor). Issue #30.
 - Tags: new tags created via popups, using percentage ranges, were missing the range property. Issue #29.
+- Configuration: .json files at 'foobar2000\js_data\presets\global' not being saved with the calculated properties based on user values from other files.
 
 ## [7.2.0] - 2024-03-21
 ### Added

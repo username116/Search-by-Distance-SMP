@@ -1,5 +1,5 @@
 ﻿'use strict';
-//09/06/24
+//14/06/24
 var version = '7.2.0'; // NOSONAR [shared on files]
 
 /* exported  searchByDistance, checkScoringDistribution */
@@ -1052,8 +1052,11 @@ async function searchByDistance({
 			tag.weight = 0;
 		}
 	}
-	const totalWeight = Object.keys(calcTags).reduce((total, key) => { return total + calcTags[key].weight; }, 0); //100%
-	const countWeights = Object.keys(calcTags).reduce((total, key) => { return (total + (calcTags[key].weight !== 0 ? 1 : 0)); }, 0);
+	// Related and unrelated tags are not considered here, but just added to the total score before any calculation is done, to break asap. Tracks witch such tags are accounted with extra queries
+	const totalWeight = Object.keys(calcTags).filter((key) => !['related', 'unrelated'].includes(key))
+		.reduce((total, key) => { return total + calcTags[key].weight; }, 0); //100%
+	const countWeights = Object.keys(calcTags).filter((key) => !['related', 'unrelated'].includes(key))
+		.reduce((total, key) => { return (total + (calcTags[key].weight !== 0 ? 1 : 0)); }, 0);
 	if (bSearchDebug) { console.log('Init Weights:', totalWeight, countWeights); }
 	let originalWeightValue = 0;
 	// Queries and ranges
@@ -1199,7 +1202,13 @@ async function searchByDistance({
 		let iso;
 		if (bUseTheme) { iso = (Object.hasOwn(theme.tags[0], 'iso') ? theme.tags[0].iso[0] : '') || ''; }
 		else {
-			const localeTag = fb.TitleFormat(_bt(calcTags.artistRegion.tf)).EvalWithMetadb(sel).split(', ').filter(Boolean).pop() || '';
+			const bSep = calcTags.artistRegion.tf.indexOf('$') === -1 && calcTags.artistRegion.tf.indexOf('%') === -1;
+			const tagName = bSep
+				? '[$meta_sep(' + calcTags.artistRegion.tf + ',|‎ |)'
+				: _bt(calcTags.artistRegion.tf);
+			// Exotic separators are preferred to ', ' since this tag may contain such char...
+			const localeTag = fb.TitleFormat(tagName).EvalWithMetadb(sel)
+				.split(bSep ? '|‎ |' : ', ').filter(Boolean).pop() || '';
 			if (localeTag.length) { iso = getCountryISO(localeTag); }
 			else {
 				const artist = fb.TitleFormat(globTags.artist).EvalWithMetadb(sel);
@@ -1246,6 +1255,7 @@ async function searchByDistance({
 			tag.weight = 0;
 		}
 		if (key === 'related' && tag.weight !== 0) {
+			preQueryLength = query.length;
 			query[preQueryLength] = queryJoin(queryCombinations([...tag.referenceSet], ['MUSICBRAINZ_TRACKID', 'ARTIST', 'TITLE'], 'OR'), 'OR');
 		}
 	});
@@ -1307,9 +1317,17 @@ async function searchByDistance({
 		} else if (queryLength === 1 && !query[0].length) { query[queryLength] = ''; }
 		else { query[queryLength] = queryJoin(query, 'OR'); } //join previous query's
 	}
-	const queryStages = []; // Currently unused
+	const queryStages = []; // Micro optimization of queries
 	if (bSameArtistFilter && !bUseTheme) {
-		let tags = fb.TitleFormat('[' + globTags.artist + ']').EvalWithMetadb(sel).split(', ').filter(Boolean);
+		// For standard artist tags, it's safer to use all, otherwise limit it to the user tag
+		// Exotic separators are preferred to ', ' since this tag may contain such char...
+		const tagName = ['ALBUM ARTIST', 'ARTIST'].includes(globTags.artistRaw.toUpperCase())
+			? '[$meta_sep(ALBUM ARTIST,|‎ |)|‎ |$meta_sep(ARTIST,|‎ |)]'
+			: '[$meta_sep(' + globTags.artistRaw + ',|‎ |)]';
+		const tags = [...new Set(
+			fb.TitleFormat(tagName)
+				.EvalWithMetadb(sel).split('|‎ |').filter(Boolean)
+		)];
 		let queryArtist = '';
 		if (tags.length) {
 			queryArtist = tags.map((artist) => { return globTags.artist + ' IS ' + artist; });
@@ -1322,8 +1340,11 @@ async function searchByDistance({
 	}
 	if (bSimilArtistsFilter && !bUseTheme) {
 		const file = folders.data + 'searchByDistance_artists.json';
-		const tagName = 'SIMILAR ARTISTS SEARCHBYDISTANCE';
-		let similTags = fb.TitleFormat(_bt(tagName)).EvalWithMetadb(sel).split(', ').filter(Boolean);
+		const tagName = '[$meta_sep(SIMILAR ARTISTS SEARCHBYDISTANCE,|‎ |)]';
+		// Exotic separators are preferred to ', ' since this tag may contain such char...
+		const similTags = [...new Set(
+			fb.TitleFormat(tagName).EvalWithMetadb(sel).split('|‎ |').filter(Boolean)
+		)];
 		let querySimil = '';
 		if (!similTags.length && _isFile(file)) {
 			const data = _jsonParseFile(file, utf8);
@@ -1641,7 +1662,7 @@ async function searchByDistance({
 			const tag = calcTags[key];
 			if (tag.weight === 0) { continue; }
 			if (tag.bVirtual) { continue; }
-			if (currScoreAvailable < minScoreFilter) { continue; } // Break asap
+			if (currScoreAvailable < minScoreFilter) { break; } // Break asap
 			const scoringDistr = tag.scoringDistribution;
 			if (tag.bMultiple) {
 				const newTag = handleTag[key].number;
