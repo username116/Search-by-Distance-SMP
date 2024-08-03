@@ -2,6 +2,8 @@
 
 ## [Table of Contents]
 - [Unreleased](#unreleased)
+- [7.4.0](#740---2024-07-30)
+- [7.3.0](#730---2024-07-24)
 - [7.2.0](#720---2024-03-21)
 - [7.1.0](#710---2024-03-15)
 - [7.0.0](#700---2024-02-28)
@@ -53,6 +55,21 @@
 
 ## [Unreleased][]
 ### Added
+### Changed
+### Removed
+### Fixed
+
+## [7.4.0] - 2024-07-30
+### Added
+- Descriptors: added Retrowave style.
+- Near Genres Filter: new option to filter the library using only genres/styles which are near the selected reference, greatly reducing processing time up to 50% (although some corner cases similar after calculating the mean distance may be excluded). By default is set to Auto. It works with any of the search methods, although it uses the genres relationship found at the GRAPH method.
+### Changed
+- UI: minor QoL improvements on menu entries.
+### Removed
+### Fixed
+
+## [7.3.0] - 2024-07-24
+### Added
 - Descriptors: added Cloud Rap, Grime, Deathcore, Neoperreo, Emo Rap, Rumba Flamenca and Dark Techno styles.
 - Descriptors: added Gothic XL style, Urban Rap XL, Urban R&B XL, Electronic Rap XL, Sad Emo XL, Progressive Electronic XL and Early Progressive Electronic XL cluster.
 - Remove duplicates: added multi-value parsing to duplicates removal. i.e. A track with multiple artists but same title can be considered a duplicated if at least one of those artists matches (instead of requiring all to match).  This setting can be switched at the 'Other settings...\Duplicates' submenu. See [this](https://github.com/regorxxx/Search-by-Distance-SMP/issues/31#issuecomment-2111061984) for more info.
@@ -84,7 +101,6 @@
 - Presets: recipe error on some cases for user-created recipes. May require to rebuild user created recipes (or remove any trace of "poolFilteringTag" from them using a text editor). Issue #30.
 - Tags: new tags created via popups, using percentage ranges, were missing the range property. Issue #29.
 - Configuration: .json files at 'foobar2000\js_data\presets\global' not being saved with the calculated properties based on user values from other files.
-
 ## [7.2.0] - 2024-03-21
 ### Added
 - Descriptors: added Musical, Cabaret, Murga, Industrial Musical, Rock Musical, Music Hall, Revue, Vaudeville and Chèo styles.
@@ -862,7 +878,9 @@
 ### Removed
 ### Fixed
 
-[Unreleased]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.2.0...HEAD
+[Unreleased]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.4.0...HEAD
+[7.4.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.3.0...v7.4.0
+[7.3.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.2.0...v7.3.0
 [7.2.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.1.0...v7.2.0
 [7.1.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v7.0.0...v7.1.0
 [7.0.0]: https://github.com/regorxxx/Search-by-Distance-SMP/compare/v6.1.3...v7.0.0
